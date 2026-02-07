@@ -1,53 +1,127 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Get button elements
-    const getStartedBtn = document.getElementById('getStartedBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    
-    // Get Started Button Functionality
-    getStartedBtn.addEventListener('click', function() {
-        // Add click animation
-        this.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.style.transform = '';
-            // Navigate to auth page with register tab active
-            window.location.href = 'auth.html#register';
-        }, 150);
-    });
-    
-    // Login Button Functionality
-    loginBtn.addEventListener('click', function() {
-        // Add click animation
-        this.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.style.transform = '';
-            // Navigate to auth page with login tab active
-            window.location.href = 'auth.html#login';
-        }, 150);
-    });
-    
-    // Add smooth scrolling for any anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
+    try {
+        // Get button elements with error checking
+        const getStartedBtn = document.getElementById('getStartedBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        
+        if (!getStartedBtn || !loginBtn) {
+            console.warn('Navigation buttons not found');
+            return;
+        }
+        
+        // Get Started Button Functionality
+        getStartedBtn.addEventListener('click', function(e) {
+            try {
+                e.preventDefault();
+                // Add click animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                    // Navigate to auth page with register tab active
+                    window.location.href = 'auth.html#register';
+                }, 150);
+            } catch (error) {
+                console.error('Error in Get Started button:', error);
+                // Fallback navigation
+                window.location.href = 'auth.html';
+            }
         });
-    });
+        
+        // Login Button Functionality
+        loginBtn.addEventListener('click', function(e) {
+            try {
+                e.preventDefault();
+                // Add click animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                    // Navigate to auth page with login tab active
+                    window.location.href = 'auth.html#login';
+                }, 150);
+            } catch (error) {
+                console.error('Error in Login button:', error);
+                // Fallback navigation
+                window.location.href = 'auth.html';
+            }
+        });
     
-    // Add fade-in animation for feature cards on scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
+        // Add smooth scrolling for any anchor links
+        try {
+            const anchorLinks = document.querySelectorAll('a[href^="#"]');
+            anchorLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    try {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        
+                        if (targetElement) {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    } catch (scrollError) {
+                        console.error('Error in smooth scrolling:', scrollError);
+                    }
+                });
+            });
+        } catch (error) {
+            console.warn('Smooth scrolling setup failed:', error);
+        }
     
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
+        // Add fade-in animation for feature cards on scroll
+        try {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(entry => {
+                        try {
+                            if (entry.isIntersecting) {
+                                entry.target.style.opacity = '1';
+                                entry.target.style.transform = 'translateY(0)';
+                                observer.unobserve(entry.target);
+                            }
+                        } catch (observerError) {
+                            console.error('Error in intersection observer:', observerError);
+                        }
+                    });
+                }, observerOptions);
+                
+                // Observe feature cards and thinking steps
+                const animatedElements = document.querySelectorAll('.feature-card, .thinking-step');
+                animatedElements.forEach(el => {
+                    if (el) {
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateY(20px)';
+                        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                        observer.observe(el);
+                    }
+                });
+            } else {
+                // Fallback for browsers without IntersectionObserver
+                const animatedElements = document.querySelectorAll('.feature-card, .thinking-step');
+                animatedElements.forEach(el => {
+                    if (el) {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }
+                });
+            }
+        } catch (error) {
+            console.warn('Animation setup failed:', error);
+        }
+        
+    } catch (error) {
+        console.error('Main script initialization failed:', error);
+    }
+});
                 entry.target.style.transform = 'translateY(0)';
             }
         });
