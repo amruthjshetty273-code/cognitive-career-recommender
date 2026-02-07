@@ -106,8 +106,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function getStrengthText(score) {
-        const strengthLevels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-        return strengthLevels[score] || 'Very Weak';
+        const strengthLevels = ['Very Weak 🔴', 'Weak 🔴', 'Medium 🟡', 'Good 🟢', 'Strong 🟢'];
+        return strengthLevels[score] || 'Very Weak 🔴';
     }
     
     function updatePasswordStrength(strength) {
@@ -115,9 +115,17 @@ document.addEventListener('DOMContentLoaded', function() {
             strengthBar.style.width = strength.percentage + '%';
             strengthText.textContent = strength.text;
             
-            // Update color based on strength
-            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a'];
-            strengthBar.style.background = colors[strength.score] || '#ef4444';
+            // Remove existing classes
+            strengthBar.classList.remove('weak', 'medium', 'strong');
+            
+            // Add appropriate class based on strength
+            if (strength.score <= 2) {
+                strengthBar.classList.add('weak');
+            } else if (strength.score <= 3) {
+                strengthBar.classList.add('medium');
+            } else {
+                strengthBar.classList.add('strong');
+            }
         }
     }
     
