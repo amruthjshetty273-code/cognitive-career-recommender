@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const formWrappers = document.querySelectorAll('.form-wrapper');
                     
                     if (tabBtns.length === 0 || formWrappers.length === 0) {
-                        console.warn('Tab elements not found');
                         return;
                     }
                     
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             } catch (error) {
-                console.error('Error handling initial tab:', error);
+                // Silent error handling
             }
         }
     
@@ -196,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } catch (error) {
-            console.error('Error showing validation message:', error);
+            // Silent error handling
         }
     }
     
@@ -448,8 +447,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize animations
     animateShapes();
     
-    // Console welcome message
-    console.log('🔐 Authentication System Loaded');
-    console.log('Features: Login, Registration, Guest Access, Social Auth');
-    console.log('Team AKATSUKI - Cognitive Career & Job Recommendation System');
 });

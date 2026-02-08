@@ -82,12 +82,15 @@ body {
 /* Header Styles */
 .header {
     background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding: 1rem 0;
     position: sticky;
     top: 0;
     z-index: 1000;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 .nav {
@@ -187,6 +190,7 @@ body {
     border: none;
     border-radius: 50px;
     cursor: pointer;
+    -webkit-transition: all 0.3s ease;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -198,6 +202,11 @@ body {
     overflow: hidden;
     z-index: 1;
     pointer-events: auto;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }
 
 .btn-large {
@@ -219,7 +228,9 @@ body {
     height: 0;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.3);
+    -webkit-transition: width 0.6s, height 0.6s;
     transition: width 0.6s, height 0.6s;
+    -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     z-index: -1;
     pointer-events: none;
@@ -259,6 +270,7 @@ body {
     color: #fff;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 50px;
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     font-size: 0.9rem;
     padding: 0.8rem 1.8rem;

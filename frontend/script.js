@@ -1,6 +1,5 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Script loaded successfully!');
     
     try {
         // Get button elements with error checking
@@ -8,43 +7,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const loginBtn = document.getElementById('loginBtn');
         const tryDemoBtn = document.getElementById('tryDemoBtn');
         
-        console.log('Button search results:', {
-            getStarted: !!getStartedBtn,
-            login: !!loginBtn,
-            tryDemo: !!tryDemoBtn
-        });
-        
         // Get Started Button Functionality
         if (getStartedBtn) {
-            console.log('Get Started button found, adding event listener');
             getStartedBtn.addEventListener('click', function() {
-                console.log('Get Started button clicked - navigating to auth.html#register');
                 window.location.href = 'auth.html#register';
             });
-        } else {
-            console.error('Get Started button not found!');
         }
         
         // Login Button Functionality
         if (loginBtn) {
-            console.log('Login button found, adding event listener');
             loginBtn.addEventListener('click', function() {
-                console.log('Login button clicked - navigating to auth.html#login');
                 window.location.href = 'auth.html#login';
             });
-        } else {
-            console.error('Login button not found!');
         }
         
         // Try Demo Button Functionality
         if (tryDemoBtn) {
-            console.log('Try Demo button found, adding event listener');
             tryDemoBtn.addEventListener('click', function() {
-                console.log('Try Demo button clicked - showing demo');
-                alert('🧠 AI Demo: Career Match - Data Scientist (96% match)\n📈 Missing Skills: ML, SQL\n\nSign up to get your full career analysis!');
+                showDemoModal();
             });
-        } else {
-            console.error('Try Demo button not found!');
         }
     
         // Add smooth scrolling for any anchor links
@@ -64,12 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                         }
                     } catch (scrollError) {
-                        console.error('Error in smooth scrolling:', scrollError);
+                        // Silent error handling
                     }
                 });
             });
         } catch (error) {
-            console.warn('Smooth scrolling setup failed:', error);
+            // Silent error handling
         }
     
         // Add fade-in animation for feature cards on scroll
@@ -89,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 observer.unobserve(entry.target);
                             }
                         } catch (observerError) {
-                            console.error('Error in intersection observer:', observerError);
+                            // Silent error handling
                         }
                     });
                 }, observerOptions);
@@ -115,19 +96,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.warn('Animation setup failed:', error);
+            // Silent error handling
         }
         
     } catch (error) {
-        console.error('Main script initialization failed:', error);
+        // Silent error handling
     }
 });
 
 // Demo Modal Functionality
 function showDemoModal() {
     try {
-        // Create demo modal
+        // Create demo modal with improved design
         const modal = document.createElement('div');
+        modal.className = 'demo-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-labelledby', 'demo-title');
+        modal.setAttribute('aria-modal', 'true');
         modal.style.cssText = `
             position: fixed;
             top: 0;
@@ -146,57 +131,76 @@ function showDemoModal() {
         const modalContent = document.createElement('div');
         modalContent.style.cssText = `
             background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            max-width: 500px;
+            padding: 2.5rem;
+            border-radius: 20px;
+            max-width: 520px;
+            width: 90%;
             max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
             text-align: center;
             transform: scale(0.8);
             transition: transform 0.3s ease;
         `;
         
         modalContent.innerHTML = `
-            <h2 style="color: #6C63FF; margin-bottom: 1rem;">🧠 AI Demo Experience</h2>
-            <p style="color: #6b7280; margin-bottom: 1.5rem;">Experience our AI-powered career recommendations:</p>
-            <div style="text-align: left; margin: 1.5rem 0;">
-                <div style="padding: 1rem; background: #f8fafc; border-radius: 8px; margin-bottom: 1rem;">
-                    <strong>🎯 Career Match:</strong> Data Scientist (96% match)<br>
-                    <span style="color: #6b7280; font-size: 0.9rem;">Based on your Python skills and analytical thinking</span>
+            <h2 id="demo-title" style="color: #6C63FF; margin-bottom: 1.5rem; font-size: 1.8rem;">🧠 AI Career Demo</h2>
+            <p style="color: #6b7280; margin-bottom: 2rem; font-size: 1.1rem;">Experience our AI-powered career recommendations:</p>
+            <div style="text-align: left; margin: 2rem 0;">
+                <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #6C63FF;">
+                    <strong style="color: #1f2937; font-size: 1.1rem;">🎯 Perfect Career Match</strong><br>
+                    <span style="color: #4338ca; font-size: 1.2rem; font-weight: 600;">Data Scientist (96% match)</span><br>
+                    <small style="color: #6b7280; font-size: 0.9rem;">Based on your analytical skills and Python expertise</small>
                 </div>
-                <div style="padding: 1rem; background: #f8fafc; border-radius: 8px; margin-bottom: 1rem;">
-                    <strong>📈 Skill Gaps:</strong> Machine Learning, SQL<br>
-                    <span style="color: #6b7280; font-size: 0.9rem;">Recommended: Take our ML fundamentals course</span>
+                <div style="padding: 1.5rem; background: #fef3c7; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
+                    <strong style="color: #1f2937; font-size: 1.1rem;">📈 Skills To Develop</strong><br>
+                    <span style="color: #d97706; font-weight: 600;">Machine Learning, Advanced SQL</span><br>
+                    <small style="color: #6b7280; font-size: 0.9rem;">Complete these to reach 99% career readiness</small>
+                </div>
+                <div style="padding: 1.5rem; background: #ecfdf5; border-radius: 12px; border-left: 4px solid #10b981;">
+                    <strong style="color: #1f2937; font-size: 1.1rem;">💰 Salary Potential</strong><br>
+                    <span style="color: #059669; font-weight: 600; font-size: 1.2rem;">$95,000 - $140,000</span><br>
+                    <small style="color: #6b7280; font-size: 0.9rem;">Average for Data Scientists in your location</small>
                 </div>
             </div>
             <button id="closeDemoBtn" style="
-                background: linear-gradient(45deg, #00E5A8, #00C2FF);
+                background: linear-gradient(45deg, #6C63FF, #7B5CFA);
                 color: white;
                 border: none;
-                padding: 0.8rem 2rem;
-                border-radius: 25px;
+                padding: 1rem 2.5rem;
+                border-radius: 50px;
                 cursor: pointer;
                 font-weight: 600;
-                margin-top: 1rem;
-            ">Get Full Experience</button>
+                font-size: 1.1rem;
+                margin-top: 1.5rem;
+                transition: transform 0.2s ease;
+                box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                Get My Complete Analysis
+            </button>
         `;
         
         modal.appendChild(modalContent);
         document.body.appendChild(modal);
         
+        // Focus management for accessibility
+        const closeBtn = modalContent.querySelector('#closeDemoBtn');
+        
         // Animate modal in
         setTimeout(() => {
             modal.style.opacity = '1';
             modalContent.style.transform = 'scale(1)';
+            closeBtn.focus();
         }, 10);
         
-        // Close modal functionality
-        const closeBtn = modalContent.querySelector('#closeDemoBtn');
         const closeModal = () => {
             modal.style.opacity = '0';
             modalContent.style.transform = 'scale(0.8)';
-            setTimeout(() => document.body.removeChild(modal), 300);
+            setTimeout(() => {
+                if (document.body.contains(modal)) {
+                    document.body.removeChild(modal);
+                }
+            }, 300);
         };
         
         closeBtn.addEventListener('click', () => {
@@ -208,21 +212,24 @@ function showDemoModal() {
             if (e.target === modal) closeModal();
         });
         
-        // Close on Escape key
-        document.addEventListener('keydown', function escHandler(e) {
+        // Enhanced keyboard navigation
+        const handleKeydown = (e) => {
             if (e.key === 'Escape') {
                 closeModal();
-                document.removeEventListener('keydown', escHandler);
+                document.removeEventListener('keydown', handleKeydown);
             }
-        });
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                closeBtn.focus();
+            }
+        };
+        
+        document.addEventListener('keydown', handleKeydown);
         
     } catch (error) {
-        console.error('Error showing demo modal:', error);
-        alert('Demo: Get 96% career match as Data Scientist! Sign up to discover your perfect career path.');
+        // Enhanced fallback with better messaging
+        const fallbackMessage = `🧠 AI Career Demo\n\n🎯 Perfect Match: Data Scientist (96%)\n📈 Skills Needed: ML, Advanced SQL\n💰 Salary Range: $95k - $140k\n\n✨ Sign up to get your complete career analysis!`;
+        alert(fallbackMessage);
     }
 }
-
-// Console message for developers
-console.log('🚀 Cognitive Career & Job Recommendation System - Home Page Loaded');
-console.log('Team AKATSUKI - Intelligent career guidance through Cognitive and Explainable AI');
 });
