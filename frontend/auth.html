@@ -30,6 +30,49 @@
     <link rel="stylesheet" href="auth-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    
+    <!-- Immediate tab switching script -->
+    <script>
+        function switchToTab(targetTab) {
+            // Remove active class from all tabs and forms
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const formWrappers = document.querySelectorAll('.form-wrapper');
+            
+            tabBtns.forEach(tab => tab.classList.remove('active'));
+            formWrappers.forEach(wrapper => wrapper.classList.remove('active'));
+            
+            // Activate the target tab
+            const tabBtn = document.querySelector(`[data-tab="${targetTab}"]`);
+            const formWrapper = document.getElementById(targetTab + '-form');
+            
+            if (tabBtn && formWrapper) {
+                tabBtn.classList.add('active');
+                formWrapper.classList.add('active');
+            }
+        }
+        
+        function handleHash() {
+            const hash = window.location.hash.substring(1);
+            if (hash === 'register') {
+                switchToTab('register');
+            } else if (hash === 'login') {
+                switchToTab('login');
+            } else {
+                // Default to login if no hash
+                switchToTab('login');
+            }
+        }
+        
+        // Handle hash immediately when script runs
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', handleHash);
+        } else {
+            handleHash();
+        }
+        
+        // Handle hash changes (back/forward navigation)
+        window.addEventListener('hashchange', handleHash);
+    </script>
 </head>
 <body>
     <div class="auth-container">
@@ -59,11 +102,11 @@
             <div class="auth-card">
                 <!-- Tab Navigation -->
                 <div class="tab-navigation">
-                    <button class="tab-btn active" data-tab="login">
+                    <button class="tab-btn" data-tab="login" id="loginTab" onclick="switchToTab('login'); window.location.hash='login';">
                         <i class="fas fa-sign-in-alt"></i>
                         Login
                     </button>
-                    <button class="tab-btn" data-tab="register">
+                    <button class="tab-btn" data-tab="register" id="registerTab" onclick="switchToTab('register'); window.location.hash='register';">
                         <i class="fas fa-user-plus"></i>
                         Register
                     </button>
@@ -73,7 +116,7 @@
                 <div class="forms-container">
                     
                     <!-- Login Form -->
-                    <div class="form-wrapper active" id="login-form">
+                    <div class="form-wrapper" id="login-form">
                         <div class="form-header">
                             <h2>Welcome Back!</h2>
                             <p>Sign in to your account to continue</p>
