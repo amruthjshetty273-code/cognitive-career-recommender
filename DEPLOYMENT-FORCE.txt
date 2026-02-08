@@ -1,0 +1,3 @@
+Deployment timestamp: 2026-02-09 Final
+Force Vercel to deploy latest version with all 3 buttons visible
+Current buttons: Get Started, Login, Try Demo
