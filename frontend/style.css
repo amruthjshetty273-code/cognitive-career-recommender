@@ -579,6 +579,79 @@ body {
     }
 }
 
+/* FAQ Section */
+.faq {
+    background: #ffffff;
+    padding: 5rem 2rem;
+    color: #333333;
+    position: relative;
+}
+
+.faq::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #7C3AED 50%, transparent 100%);
+}
+
+.faq-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.faq-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #7C3AED 0%, #2D1B69 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.faq-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.faq-item {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    border-color: #7C3AED;
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
+    transform: translateY(-2px);
+}
+
+.faq-question {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2D1B69;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.faq-answer {
+    font-size: 0.95rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
 /* Footer */
 .footer {
     background: #1f2937;
@@ -620,7 +693,7 @@ body {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-    .features-container, .ai-thinking-container, .footer-content {
+    .features-container, .ai-thinking-container, .faq-container, .footer-content {
         max-width: 95%;
     }
     
@@ -631,6 +704,14 @@ body {
     .features-grid {
         gap: 1.5rem;
         padding: 0 1rem;
+    }
+    
+    .faq {
+        padding: 4rem 1rem;
+    }
+    
+    .faq-title {
+        font-size: 2.2rem;
     }
 }
 
@@ -688,6 +769,22 @@ body {
     
     .feature-card {
         padding: 1.8rem 1.5rem;
+    }
+    
+    .faq {
+        padding: 3rem 1rem;
+    }
+    
+    .faq-title {
+        font-size: 2rem;
+    }
+    
+    .faq-item {
+        padding: 1.25rem;
+    }
+    
+    .faq-question {
+        font-size: 1rem;
     }
     
     .footer-content {
@@ -769,6 +866,27 @@ body {
     
     .step-icon i {
         font-size: 1.2rem;
+    }
+    
+    .faq {
+        padding: 2.5rem 1rem;
+    }
+    
+    .faq-title {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .faq-item {
+        padding: 1rem;
+    }
+    
+    .faq-question {
+        font-size: 0.95rem;
+    }
+    
+    .faq-answer {
+        font-size: 0.9rem;
     }
 }
 
