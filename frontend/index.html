@@ -45,61 +45,103 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header Section -->
-        <header class="header" role="banner">
-            <nav class="nav" role="navigation" aria-label="Main navigation">
+        <!-- Navigation Header -->
+        <header class="main-header" role="banner">
+            <nav class="navbar" role="navigation" aria-label="Main navigation">
                 <div class="nav-brand">
                     <i class="fas fa-brain" aria-hidden="true"></i>
                     <span>CareerAI</span>
                 </div>
+                
+                <div class="nav-menu">
+                    <div class="nav-links">
+                        <a href="#home" class="nav-link">Home</a>
+                        <a href="#features" class="nav-link">Features</a>
+                        <a href="#faq" class="nav-link">FAQ</a>
+                        <a href="#contact" class="nav-link">Contact</a>
+                    </div>
+                    
+                    <div class="nav-actions">
+                        <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <a href="login.html" class="btn btn-outline">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login / Register
+                        </a>
+                    </div>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </nav>
         </header>
 
         <!-- Hero Section -->
-        <section class="hero" role="main" aria-labelledby="main-title">
+        <section class="hero" id="home" role="main" aria-labelledby="main-title">
             <div class="hero-content">
                 <h1 class="project-title" id="main-title">
                     <span class="title-line-1">Cognitive Career & Job Recommendation System</span>
                     <span class="title-line-2">with Explainable and Adaptive AI</span>
                 </h1>
-                <p class="subtitle">Smart career guidance powered by Cognitive and Explainable AI.</p>
+                <p class="subtitle">Personalized career guidance with intelligent AI insights</p>
+                
+                <div class="hero-visual">
+                    <div class="ai-illustration">
+                        <div class="brain-network">
+                            <div class="node node-1"></div>
+                            <div class="node node-2"></div>
+                            <div class="node node-3"></div>
+                            <div class="connection connection-1"></div>
+                            <div class="connection connection-2"></div>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="hero-buttons" role="group" aria-label="Primary actions">
-                    <button class="btn btn-primary" id="getStartedBtn" onclick="window.location.href='auth.html#register';">
+                    <button class="btn btn-primary" id="getStartedBtn" onclick="window.location.href='register.html';">
                         <i class="fas fa-rocket" aria-hidden="true"></i>
                         <span>Get Started</span>
-                    </button>
-                    <button class="btn btn-secondary" id="loginBtn" onclick="window.location.href='auth.html#login';">
-                        <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
-                        <span>Login</span>
                     </button>
                     <button class="btn btn-demo" id="tryDemoBtn" onclick="if(typeof showDemoModal === 'function') { showDemoModal(); } else { alert('AI Demo\\n\\nCareer Match: Data Scientist (96%)\\nSalary: $95k-$140k\\nSkills Needed: ML, SQL\\n\\nSign up for complete analysis!'); }">
                         <i class="fas fa-play-circle" aria-hidden="true"></i>
                         <span>Try Demo</span>
                     </button>
+                    <a href="login.html" class="login-link-btn">Login</a>
                 </div>
             </div>
         </section>
 
         <!-- Features Section -->
-        <section class="features" aria-labelledby="features-title">
+        <section class="features" id="features" aria-labelledby="features-title">
             <div class="features-container">
                 <h2 class="features-title" id="features-title">Key Features</h2>
                 <div class="features-grid" role="grid" aria-label="Product features">
-                    <article class="feature-card" role="gridcell">
+                    <article class="feature-card featured" role="gridcell">
                         <div class="feature-icon" aria-hidden="true">
                             <i class="fas fa-brain"></i>
                         </div>
                         <h3>AI Recommendations</h3>
-                        <p>Get personalized career and job recommendations based on your skills and interests.</p>
+                        <p>Personalized job recommendations using AI</p>
                     </article>
                     
                     <article class="feature-card" role="gridcell">
                         <div class="feature-icon" aria-hidden="true">
-                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-lightbulb"></i>
                         </div>
                         <h3>Explainable AI</h3>
-                        <p>Understand the reasoning behind every recommendation with clear AI explanations.</p>
+                        <p>Clear reasoning behind every recommendation</p>
+                    </article>
+                    
+                    <article class="feature-card" role="gridcell">
+                        <div class="feature-icon" aria-hidden="true">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Skill Gap Analysis</h3>
+                        <p>Identify missing skills with improvement suggestions</p>
                     </article>
                     
                     <article class="feature-card" role="gridcell">
@@ -107,15 +149,7 @@
                             <i class="fas fa-sync-alt"></i>
                         </div>
                         <h3>Adaptive Learning</h3>
-                        <p>Experience a system that learns and adapts to your preferences, improving over time.</p>
-                    </article>
-                    
-                    <article class="feature-card" role="gridcell">
-                        <div class="feature-icon" aria-hidden="true">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <h3>Skill Gap Analysis</h3>
-                        <p>Identify missing skills and get improvement suggestions through intelligent analysis.</p>
+                        <p>System learns and improves with your feedback</p>
                     </article>
                 </div>
             </div>
@@ -124,156 +158,234 @@
         <!-- How Our AI Thinks Section -->
         <section class="ai-thinking" aria-labelledby="ai-thinking-title">
             <div class="ai-thinking-container">
-                <h2 class="ai-thinking-title" id="ai-thinking-title">How Our AI Thinks</h2>
-                <p class="ai-thinking-subtitle">Experience intelligent decision-making process</p>
+                <h2 class="ai-thinking-title" id="ai-thinking-title">How Our AI Works</h2>
+                <p class="ai-thinking-subtitle">Intelligent decision-making process</p>
                 
                 <div class="thinking-flow" role="list" aria-label="AI thinking process steps">
                     <div class="thinking-step" role="listitem">
                         <div class="step-icon" aria-hidden="true">
-                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-database"></i>
                         </div>
-                        <h4>Observe</h4>
-                        <p>Gather data</p>
+                        <h4>Collect Data</h4>
+                        <p>Analyze your skills</p>
                     </div>
                     
-                    <div class="flow-arrow" aria-hidden="true">
-                        →
-                    </div>
+                    <div class="flow-arrow" aria-hidden="true">→</div>
                     
                     <div class="thinking-step" role="listitem">
                         <div class="step-icon" aria-hidden="true">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <h4>Understand</h4>
-                        <p>Process context</p>
-                    </div>
-                    
-                    <div class="flow-arrow">
-                        →
-                    </div>
-                    
-                    <div class="thinking-step">
-                        <div class="step-icon">
                             <i class="fas fa-search"></i>
                         </div>
-                        <h4>Analyze</h4>
+                        <h4>Analyze Skills</h4>
                         <p>Find patterns</p>
                     </div>
                     
-                    <div class="flow-arrow">
-                        →
-                    </div>
+                    <div class="flow-arrow" aria-hidden="true">→</div>
                     
-                    <div class="thinking-step">
-                        <div class="step-icon">
-                            <i class="fas fa-lightbulb"></i>
+                    <div class="thinking-step" role="listitem">
+                        <div class="step-icon" aria-hidden="true">
+                            <i class="fas fa-bullseye"></i>
                         </div>
-                        <h4>Reason</h4>
-                        <p>Make decisions</p>
+                        <h4>Recommend Careers</h4>
+                        <p>Match opportunities</p>
                     </div>
                     
-                    <div class="flow-arrow">
-                        →
-                    </div>
+                    <div class="flow-arrow" aria-hidden="true">→</div>
                     
-                    <div class="thinking-step">
-                        <div class="step-icon">
+                    <div class="thinking-step" role="listitem">
+                        <div class="step-icon" aria-hidden="true">
                             <i class="fas fa-comment-dots"></i>
                         </div>
-                        <h4>Explain</h4>
+                        <h4>Explain Results</h4>
                         <p>Provide insights</p>
                     </div>
-                    
-                    <div class="flow-arrow">
-                        →
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <section class="benefits" id="benefits">
+            <div class="benefits-container">
+                <h2 class="benefits-title">Why Choose Our AI System</h2>
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <i class="fas fa-clock"></i>
+                        <h3>Save Time</h3>
+                        <p>Instant career recommendations instead of hours of research</p>
                     </div>
-                    
-                    <div class="thinking-step">
-                        <div class="step-icon">
-                            <i class="fas fa-graduation-cap"></i>
+                    <div class="benefit-item">
+                        <i class="fas fa-robot"></i>
+                        <h3>AI-Based Decisions</h3>
+                        <p>Data-driven recommendations backed by machine learning</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-user"></i>
+                        <h3>Personalized Guidance</h3>
+                        <p>Tailored advice based on your unique profile and goals</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-target"></i>
+                        <h3>Accurate Matching</h3>
+                        <p>High precision career matching using advanced algorithms</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section class="use-cases">
+            <div class="use-cases-container">
+                <h2 class="use-cases-title">Who Can Use This System</h2>
+                <div class="use-cases-grid">
+                    <div class="use-case-card">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h3>Students</h3>
+                        <p>Find the right career path after graduation</p>
+                    </div>
+                    <div class="use-case-card">
+                        <i class="fas fa-user-tie"></i>
+                        <h3>Freshers</h3>
+                        <p>Get your first job with confidence</p>
+                    </div>
+                    <div class="use-case-card">
+                        <i class="fas fa-briefcase"></i>
+                        <h3>Professionals</h3>
+                        <p>Advance your career with strategic moves</p>
+                    </div>
+                    <div class="use-case-card">
+                        <i class="fas fa-exchange-alt"></i>
+                        <h3>Career Switchers</h3>
+                        <p>Transition to new industries successfully</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sample Output Section -->
+        <section class="sample-output">
+            <div class="sample-container">
+                <h2 class="sample-title">See AI in Action</h2>
+                <div class="sample-demo">
+                    <div class="sample-input">
+                        <h3>User Skills</h3>
+                        <div class="skills-tags">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">Machine Learning</span>
+                            <span class="skill-tag">SQL</span>
+                            <span class="skill-tag">Data Analysis</span>
                         </div>
-                        <h4>Learn</h4>
-                        <p>Improve results</p>
+                    </div>
+                    <div class="sample-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="sample-results">
+                        <h3>AI Recommendations</h3>
+                        <div class="recommendation-item">
+                            <span class="job-title">Data Analyst</span>
+                            <span class="match-score">85%</span>
+                        </div>
+                        <div class="recommendation-item">
+                            <span class="job-title">ML Engineer</span>
+                            <span class="match-score">78%</span>
+                        </div>
+                        <div class="recommendation-item">
+                            <span class="job-title">Data Scientist</span>
+                            <span class="match-score">72%</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- FAQ Section -->
-        <section class="faq" aria-labelledby="faq-title">
+        <section class="faq" id="faq" aria-labelledby="faq-title">
             <div class="faq-container">
                 <h2 class="faq-title" id="faq-title">Frequently Asked Questions</h2>
                 <p class="faq-subtitle">Click on any question to reveal the answer</p>
                 <div class="faq-accordion" role="region" aria-label="Frequently asked questions">
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false" aria-controls="faq-1">
-                            <span>What is Cognitive Career & Job Recommendation System?</span>
+                            <span>What is this system?</span>
                             <i class="fas fa-plus faq-icon" aria-hidden="true"></i>
                         </button>
                         <div class="faq-answer" id="faq-1">
                             <div class="faq-answer-content">
-                                <p>It is an AI-based system that suggests suitable careers and jobs based on user skills, interests, and resume analysis using advanced cognitive algorithms and machine learning techniques.</p>
+                                <p>An AI-based system that suggests suitable careers and jobs based on your skills, interests, and experience using advanced cognitive algorithms.</p>
                             </div>
                         </div>
                     </div>
                     
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false" aria-controls="faq-2">
-                            <span>How does the AI recommend jobs?</span>
+                            <span>How does AI recommend jobs?</span>
                             <i class="fas fa-plus faq-icon" aria-hidden="true"></i>
                         </button>
                         <div class="faq-answer" id="faq-2">
                             <div class="faq-answer-content">
-                                <p>The system uses Natural Language Processing (NLP) and Machine Learning to analyze your data and match it with relevant job profiles from our extensive database, providing personalized recommendations.</p>
+                                <p>The system uses Machine Learning and Natural Language Processing to analyze your profile and match it with relevant job opportunities from our database.</p>
                             </div>
                         </div>
                     </div>
                     
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false" aria-controls="faq-3">
-                            <span>What makes this system different from normal job portals?</span>
+                            <span>Is my data secure?</span>
                             <i class="fas fa-plus faq-icon" aria-hidden="true"></i>
                         </button>
                         <div class="faq-answer" id="faq-3">
                             <div class="faq-answer-content">
-                                <p>Unlike traditional portals, this system provides explainable AI recommendations, personalized career guidance, adaptive learning that improves with feedback, and transparent reasoning for every suggestion.</p>
+                                <p>Yes, your data is processed securely using industry-standard encryption. We follow strict privacy policies and never share your personal information.</p>
                             </div>
                         </div>
                     </div>
                     
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false" aria-controls="faq-4">
-                            <span>Is my data secure and private?</span>
+                            <span>How accurate are recommendations?</span>
                             <i class="fas fa-plus faq-icon" aria-hidden="true"></i>
                         </button>
                         <div class="faq-answer" id="faq-4">
                             <div class="faq-answer-content">
-                                <p>Yes, user data is processed securely using industry-standard encryption and is used only for recommendation purposes. We follow strict privacy policies and never share your personal information.</p>
+                                <p>Our AI system provides highly accurate recommendations with continuous learning. Accuracy improves as you provide more feedback and update your profile.</p>
                             </div>
                         </div>
                     </div>
                     
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false" aria-controls="faq-5">
-                            <span>How can I improve my recommendations?</span>
+                            <span>How can I improve results?</span>
                             <i class="fas fa-plus faq-icon" aria-hidden="true"></i>
                         </button>
                         <div class="faq-answer" id="faq-5">
                             <div class="faq-answer-content">
-                                <p>The system learns from your feedback and interactions. Regular profile updates, skill assessments, preference feedback, and rating recommendations help improve accuracy over time.</p>
+                                <p>Regular profile updates, skill assessments, and providing feedback on recommendations help the system learn your preferences and improve accuracy.</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="faq-item">
-                        <button class="faq-question" aria-expanded="false" aria-controls="faq-6">
-                            <span>What is Explainable AI and why is it important?</span>
-                            <i class="fas fa-plus faq-icon" aria-hidden="true"></i>
-                        </button>
-                        <div class="faq-answer" id="faq-6">
-                            <div class="faq-answer-content">
-                                <p>Explainable AI provides clear reasoning behind each recommendation, helping you understand why certain careers or jobs are suggested, building trust, and enabling better decision-making.</p>
-                            </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact" id="contact">
+            <div class="contact-container">
+                <h2 class="contact-title">Get In Touch</h2>
+                <div class="contact-content">
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <h3>Email</h3>
+                            <p>jamruthMTECH25@stu.alliance.edu.in</p>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-code-branch"></i>
+                            <h3>Project Repository</h3>
+                            <p><a href="https://github.com/amruthjshetty273-code/cognitive-career-recommender" target="_blank">View on GitHub</a></p>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-university"></i>
+                            <h3>Academic Project</h3>
+                            <p>Alliance University</p>
                         </div>
                     </div>
                 </div>
@@ -285,9 +397,17 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>Team AKATSUKI</h4>
-                    <p>Dedicated to revolutionizing career guidance through advanced AI technology.</p>
+                    <p>Cognitive Career & Job Recommendation System</p>
                 </div>
                 <div class="footer-section">
+                    <h4>Academic Project</h4>
+                    <p>Alliance University</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Repository</h4>
+                    <p><a href="https://github.com/amruthjshetty273-code/cognitive-career-recommender" target="_blank">GitHub</a></p>
+                </div>
+                <div class="footer-bottom">
                     <p>&copy; 2026 Cognitive Career & Job Recommendation System. All rights reserved.</p>
                 </div>
             </div>
