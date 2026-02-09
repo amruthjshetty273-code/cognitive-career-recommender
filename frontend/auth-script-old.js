@@ -1,8 +1,6 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     
-    console.log('Auth script loaded successfully');
-    
     try {
         // Check for hash in URL and activate appropriate tab
         function handleInitialTab() {
@@ -63,165 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Smart Password Strength System
-    const passwordInput = document.getElementById('registerPassword');
-    const strengthContainer = document.getElementById('passwordStrengthContainer');
-    const progressFill = document.getElementById('progressFill');
-    const statusText = document.getElementById('statusText');
-    const statusIcon = document.getElementById('statusIcon');
-    const lengthRule = document.getElementById('lengthRule');
-    const uppercaseRule = document.getElementById('uppercaseRule');
-    const numberRule = document.getElementById('numberRule');
-    const specialRule = document.getElementById('specialRule');
-    
-    if (passwordInput) {
-        // Show strength container when user starts typing
-        passwordInput.addEventListener('focus', function() {
-            if (strengthContainer) {
-                strengthContainer.classList.add('active');
-            }
-        });
-        
-        passwordInput.addEventListener('input', function() {
-            const password = this.value;
-            updateSmartPasswordStrength(password);
-        });
-        
-        // Hide strength container when field is empty and loses focus
-        passwordInput.addEventListener('blur', function() {
-            if (!this.value && strengthContainer) {
-                strengthContainer.classList.remove('active');
-            }
-        });
-    }
-    
-    function updateSmartPasswordStrength(password) {
-        if (!password) {
-            resetPasswordStrength();
-            return;
-        }
-        
-        // Show container if hidden
-        if (strengthContainer && !strengthContainer.classList.contains('active')) {
-            strengthContainer.classList.add('active');
-        }
-        
-        // Check password criteria
-        const criteria = {
-            length: password.length >= 8,
-            uppercase: /[A-Z]/.test(password),
-            lowercase: /[a-z]/.test(password),
-            number: /\d/.test(password),
-            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
-        };
-        
-        // Update rules checklist
-        updateRuleItem(lengthRule, criteria.length);
-        updateRuleItem(uppercaseRule, criteria.uppercase);
-        updateRuleItem(numberRule, criteria.number);
-        updateRuleItem(specialRule, criteria.special);
-        
-        // Calculate strength score
-        const validCriteria = Object.values(criteria).filter(Boolean).length;
-        const strengthLevel = getPasswordStrength(validCriteria, password.length);
-        
-        // Update progress bar and status
-        updateProgressBar(strengthLevel);
-        updateStatusDisplay(strengthLevel, validCriteria);
-        
-        console.log('Password analysis:', {
-            criteria: criteria,
-            validCriteria: validCriteria,
-            strengthLevel: strengthLevel,
-            length: password.length
-        });
-    }
-    
-    function resetPasswordStrength() {
-        // Reset all rules to invalid state
-        [lengthRule, uppercaseRule, numberRule, specialRule].forEach(rule => {
-            if (rule) {
-                rule.classList.remove('valid', 'invalid');
-                const icon = rule.querySelector('.rule-icon');
-                if (icon) {
-                    icon.className = 'rule-icon fas fa-times';
-                }
-            }
-        });
-        
-        // Reset progress bar
-        if (progressFill) {
-            progressFill.style.width = '0%';
-            progressFill.className = 'progress-fill';
-        }
-        
-        // Reset status
-        if (statusText) statusText.textContent = 'Enter password';
-        if (statusIcon) statusIcon.className = 'status-icon';
-    }
-    
-    function updateRuleItem(ruleElement, isValid) {
-        if (!ruleElement) return;
-        
-        const icon = ruleElement.querySelector('.rule-icon');
-        
-        if (isValid) {
-            ruleElement.classList.remove('invalid');
-            ruleElement.classList.add('valid');
-            if (icon) {
-                icon.className = 'rule-icon fas fa-check';
-            }
-        } else {
-            ruleElement.classList.remove('valid');
-            ruleElement.classList.add('invalid');
-            if (icon) {
-                icon.className = 'rule-icon fas fa-times';
-            }
-        }
-    }
-    
-    function getPasswordStrength(validCriteria, length) {
-        if (validCriteria <= 1 || length < 6) {
-            return 'weak';
-        } else if (validCriteria <= 3 || length < 8) {
-            return 'medium';
-        } else {
-            return 'strong';
-        }
-    }
-    
-    function updateProgressBar(strengthLevel) {
-        if (!progressFill) return;
-        
-        // Remove existing classes
-        progressFill.classList.remove('weak', 'medium', 'strong');
-        
-        // Add new class and update width
-        progressFill.classList.add(strengthLevel);
-    }
-    
-    function updateStatusDisplay(strengthLevel, validCriteria) {
-        if (!statusText || !statusIcon) return;
-        
-        // Remove existing classes
-        statusText.classList.remove('weak', 'medium', 'strong');
-        statusIcon.classList.remove('weak', 'medium', 'strong');
-        
-        // Add new classes
-        statusText.classList.add(strengthLevel);
-        statusIcon.classList.add(strengthLevel);
-        
-        // Update text based on strength
-        const statusMessages = {
-            weak: `Weak Password (${validCriteria}/4 criteria)`,
-            medium: `Medium Strength (${validCriteria}/4 criteria)`,
-            strong: `Strong Password! (${validCriteria}/4 criteria)`
-        };
-        
-        statusText.textContent = statusMessages[strengthLevel];
-    }
-    
-    // Enhanced Password Toggle Functionality
+    // Password visibility toggle
     const togglePasswordBtns = document.querySelectorAll('.toggle-password');
     
     togglePasswordBtns.forEach(btn => {
@@ -230,23 +70,115 @@ document.addEventListener('DOMContentLoaded', function() {
             const passwordInput = document.getElementById(targetId);
             const icon = this.querySelector('i');
             
-            if (passwordInput && icon) {
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                    this.classList.add('visible');
-                    this.title = 'Hide password';
-                } else {
-                    passwordInput.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                    this.classList.remove('visible');
-                    this.title = 'Show password';
-                }
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         });
     });
+    
+    // Password strength indicator
+    const passwordInput = document.getElementById('registerPassword');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthFeedback = document.querySelector('.feedback-text');
+    const weakLevel = document.getElementById('weakLevel');
+    const mediumLevel = document.getElementById('mediumLevel');
+    const strongLevel = document.getElementById('strongLevel');
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            updatePasswordStrengthLevels(password);
+        });
+        
+        // Initial state
+        updatePasswordStrengthLevels('');
+    }
+    
+    function updatePasswordStrengthLevels(password) {
+        if (!password || password.length === 0) {
+            // Reset all levels
+            if (weakLevel) weakLevel.classList.remove('active');
+            if (mediumLevel) mediumLevel.classList.remove('active');
+            if (strongLevel) strongLevel.classList.remove('active');
+            if (strengthFill) {
+                strengthFill.style.width = '0%';
+                strengthFill.classList.remove('weak', 'medium', 'strong');
+            }
+            if (strengthFeedback) {
+                strengthFeedback.textContent = 'Enter password to see strength';
+            }
+            return;
+        }
+        
+        // Calculate strength criteria
+        const criteria = {
+            length: password.length >= 8,
+            lowercase: /[a-z]/.test(password),
+            uppercase: /[A-Z]/.test(password),
+            numbers: /\d/.test(password),
+            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+        };
+        
+        const score = Object.values(criteria).filter(Boolean).length;
+        
+        // Reset all levels
+        if (weakLevel) weakLevel.classList.remove('active');
+        if (mediumLevel) mediumLevel.classList.remove('active');
+        if (strongLevel) strongLevel.classList.remove('active');
+        
+        // Update levels and bar based on score
+        if (strengthFill) {
+            strengthFill.classList.remove('weak', 'medium', 'strong');
+        }
+        
+        let strengthLevel = '';
+        let feedbackText = '';
+        
+        if (score <= 2) {
+            strengthLevel = 'weak';
+            feedbackText = `Weak password. Add ${3-score} more requirements.`;
+            if (weakLevel) weakLevel.classList.add('active');
+            if (strengthFill) {
+                strengthFill.classList.add('weak');
+                strengthFill.style.width = '33%';
+            }
+        } else if (score <= 3) {
+            strengthLevel = 'medium';
+            feedbackText = `Medium strength. Add ${5-score} more for strong password.`;
+            if (weakLevel) weakLevel.classList.add('active');
+            if (mediumLevel) mediumLevel.classList.add('active');
+            if (strengthFill) {
+                strengthFill.classList.add('medium');
+                strengthFill.style.width = '66%';
+            }
+        } else {
+            strengthLevel = 'strong';
+            feedbackText = 'Strong password! Great job. 🎉';
+            if (weakLevel) weakLevel.classList.add('active');
+            if (mediumLevel) mediumLevel.classList.add('active');
+            if (strongLevel) strongLevel.classList.add('active');
+            if (strengthFill) {
+                strengthFill.classList.add('strong');
+                strengthFill.style.width = '100%';
+            }
+        }
+        
+        if (strengthFeedback) {
+            strengthFeedback.textContent = feedbackText;
+        }
+        
+        console.log('Password strength:', {
+            score: score,
+            level: strengthLevel,
+            criteria: criteria
+        });
+    }
     
     // Enhanced form validation
     function validateEmail(email) {
@@ -560,8 +492,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize animations
     animateShapes();
     
-    } catch (error) {
-        console.error('Error in auth script:', error);
-    }
-    
-});
+    // Test password strength functionality
+    setTimeout(function() {\n        console.log('Testing password strength functionality...');\n        const testInput = document.getElementById('registerPassword');\n        const testStrengthBar = document.querySelector('.strength-fill');\n        const testStrengthText = document.querySelector('.strength-text');\n        \n        console.log('Test elements found:', {\n            input: !!testInput,\n            bar: !!testStrengthBar,\n            text: !!testStrengthText\n        });\n        \n        if (testInput && testStrengthBar && testStrengthText) {\n            console.log('Password strength system initialized successfully');\n        } else {\n            console.error('Password strength elements not found properly');\n        }\n    }, 1000);\n    
+});\n\n// Additional password strength test function\nfunction testPasswordStrength() {\n    const passwordInput = document.getElementById('registerPassword');\n    if (passwordInput) {\n        // Test with a sample password\n        passwordInput.value = 'TestPass123!';\n        passwordInput.dispatchEvent(new Event('input'));\n        console.log('Password strength test completed');\n    }\n}
