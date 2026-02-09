@@ -477,4 +477,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize animations
     animateShapes();
     
-});
+    // Test password strength functionality
+    setTimeout(function() {\n        console.log('Testing password strength functionality...');\n        const testInput = document.getElementById('registerPassword');\n        const testStrengthBar = document.querySelector('.strength-fill');\n        const testStrengthText = document.querySelector('.strength-text');\n        \n        console.log('Test elements found:', {\n            input: !!testInput,\n            bar: !!testStrengthBar,\n            text: !!testStrengthText\n        });\n        \n        if (testInput && testStrengthBar && testStrengthText) {\n            console.log('Password strength system initialized successfully');\n        } else {\n            console.error('Password strength elements not found properly');\n        }\n    }, 1000);\n    
+});\n\n// Additional password strength test function\nfunction testPasswordStrength() {\n    const passwordInput = document.getElementById('registerPassword');\n    if (passwordInput) {\n        // Test with a sample password\n        passwordInput.value = 'TestPass123!';\n        passwordInput.dispatchEvent(new Event('input'));\n        console.log('Password strength test completed');\n    }\n}
