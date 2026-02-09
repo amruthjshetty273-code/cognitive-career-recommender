@@ -320,40 +320,54 @@ body {
 
 /* Password Strength */
 .password-strength {
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
+    opacity: 1;
+    visibility: visible;
+    display: block;
 }
 
 .strength-bar {
     width: 100%;
-    height: 4px;
-    background: #e5e7eb;
-    border-radius: 2px;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
     overflow: hidden;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #cbd5e1;
 }
 
 .strength-fill {
     height: 100%;
     width: 0%;
-    transition: width 0.3s ease, background-color 0.3s ease;
-    border-radius: 2px;
+    background: #e2e8f0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 3px;
+    min-width: 0;
 }
 
 .strength-fill.weak {
-    background: #ef4444;
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
 }
 
 .strength-fill.medium {
-    background: #eab308;
+    background: linear-gradient(90deg, #f59e0b, #eab308);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
 }
 
 .strength-fill.strong {
-    background: #22c55e;
+    background: linear-gradient(90deg, #10b981, #059669);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
 }
 
 .strength-text {
-    font-size: 0.75rem;
-    color: #6b7280;
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+    text-align: left;
+    line-height: 1.2;
+    display: block;
 }
 
 /* Form Options */

@@ -87,12 +87,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const strengthBar = document.querySelector('.strength-fill');
     const strengthText = document.querySelector('.strength-text');
     
-    if (passwordInput) {
+    // Debug: Check if elements are found
+    console.log('Password input found:', !!passwordInput);
+    console.log('Strength bar found:', !!strengthBar);
+    console.log('Strength text found:', !!strengthText);
+    
+    if (passwordInput && strengthBar && strengthText) {
         passwordInput.addEventListener('input', function() {
             const password = this.value;
             const strength = calculatePasswordStrength(password);
             updatePasswordStrength(strength);
         });
+        
+        // Initial state
+        updatePasswordStrength({ score: 0, percentage: 0, text: 'Password strength' });
     }
     
     function calculatePasswordStrength(password) {
@@ -115,13 +123,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function getStrengthText(score) {
-        const strengthLevels = ['Very Weak 🔴', 'Weak 🔴', 'Medium 🟡', 'Good 🟢', 'Strong 🟢'];
-        return strengthLevels[score] || 'Very Weak 🔴';
+        const strengthLevels = {
+            0: 'Password strength',
+            1: 'Very Weak',
+            2: 'Weak', 
+            3: 'Medium',
+            4: 'Good',
+            5: 'Strong'
+        };
+        return strengthLevels[score] || 'Password strength';
     }
     
     function updatePasswordStrength(strength) {
         if (strengthBar && strengthText) {
+            // Update width
             strengthBar.style.width = strength.percentage + '%';
+            
+            // Update text
             strengthText.textContent = strength.text;
             
             // Remove existing classes
@@ -135,6 +153,15 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 strengthBar.classList.add('strong');
             }
+            
+            // Debug output
+            console.log('Password strength updated:', {
+                score: strength.score,
+                percentage: strength.percentage,
+                text: strength.text
+            });
+        } else {
+            console.log('Strength elements not found for update');
         }
     }
     
@@ -300,9 +327,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!password) {
                 showError('registerPassword', 'Password is required');
                 isValid = false;
-            } else if (!validatePassword(password)) {
-                showError('registerPassword', 'Password must be at least 8 characters long');
-                isValid = false;
+            } else {
+                const passwordValidation = validatePassword(password);
+                if (!passwordValidation.isValid) {
+                    showError('registerPassword', passwordValidation.errors);
+                    isValid = false;
+                }
             }
             
             // Check terms agreement
