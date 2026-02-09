@@ -10,14 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get Started Button Functionality
         if (getStartedBtn) {
             getStartedBtn.addEventListener('click', function() {
-                window.location.href = 'auth.html#register';
+                window.location.href = 'register.html';
             });
         }
         
         // Login Button Functionality
         if (loginBtn) {
             loginBtn.addEventListener('click', function() {
-                window.location.href = 'auth.html#login';
+                window.location.href = 'login.html';
             });
         }
         
@@ -144,21 +144,21 @@ function showDemoModal() {
         `;
         
         modalContent.innerHTML = `
-            <h2 id="demo-title" style="color: #6C63FF; margin-bottom: 1.5rem; font-size: 1.8rem;">🧠 AI Career Demo</h2>
+            <h2 id="demo-title" style="color: #6C63FF; margin-bottom: 1.5rem; font-size: 1.8rem;">AI Career Demo</h2>
             <p style="color: #6b7280; margin-bottom: 2rem; font-size: 1.1rem;">Experience our AI-powered career recommendations:</p>
             <div style="text-align: left; margin: 2rem 0;">
                 <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #6C63FF;">
-                    <strong style="color: #1f2937; font-size: 1.1rem;">🎯 Perfect Career Match</strong><br>
+                    <strong style="color: #1f2937; font-size: 1.1rem;">Perfect Career Match</strong><br>
                     <span style="color: #4338ca; font-size: 1.2rem; font-weight: 600;">Data Scientist (96% match)</span><br>
                     <small style="color: #6b7280; font-size: 0.9rem;">Based on your analytical skills and Python expertise</small>
                 </div>
                 <div style="padding: 1.5rem; background: #fef3c7; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
-                    <strong style="color: #1f2937; font-size: 1.1rem;">📈 Skills To Develop</strong><br>
+                    <strong style="color: #1f2937; font-size: 1.1rem;">Skills To Develop</strong><br>
                     <span style="color: #d97706; font-weight: 600;">Machine Learning, Advanced SQL</span><br>
                     <small style="color: #6b7280; font-size: 0.9rem;">Complete these to reach 99% career readiness</small>
                 </div>
                 <div style="padding: 1.5rem; background: #ecfdf5; border-radius: 12px; border-left: 4px solid #10b981;">
-                    <strong style="color: #1f2937; font-size: 1.1rem;">💰 Salary Potential</strong><br>
+                    <strong style="color: #1f2937; font-size: 1.1rem;">Salary Potential</strong><br>
                     <span style="color: #059669; font-weight: 600; font-size: 1.2rem;">$95,000 - $140,000</span><br>
                     <small style="color: #6b7280; font-size: 0.9rem;">Average for Data Scientists in your location</small>
                 </div>
@@ -228,8 +228,69 @@ function showDemoModal() {
         
     } catch (error) {
         // Enhanced fallback with better messaging
-        const fallbackMessage = `🧠 AI Career Demo\n\n🎯 Perfect Match: Data Scientist (96%)\n📈 Skills Needed: ML, Advanced SQL\n💰 Salary Range: $95k - $140k\n\n✨ Sign up to get your complete career analysis!`;
+        const fallbackMessage = `AI Career Demo\n\nPerfect Match: Data Scientist (96%)\nSkills Needed: ML, Advanced SQL\nSalary Range: $95k - $140k\n\nSign up to get your complete career analysis!`;
         alert(fallbackMessage);
+    }
+
+    // Mobile Menu Toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (mobileMenuToggle && navMenu) {
+        mobileMenuToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            this.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!mobileMenuToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+            }
+        });
+
+        // Close mobile menu when clicking nav links
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                navMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+            });
+        });
+    }
+
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    
+    if (themeToggle) {
+        // Check for saved theme preference or default to dark theme
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.body.className = `theme-${currentTheme}`;
+        
+        // Update theme toggle icon
+        updateThemeIcon(currentTheme);
+        
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = document.body.className.includes('theme-light') ? 'light' : 'dark';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.body.className = `theme-${newTheme}`;
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+    }
+
+    function updateThemeIcon(theme) {
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i');
+            if (theme === 'light') {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        }
     }
 }
 });

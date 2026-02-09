@@ -61,7 +61,87 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Password visibility toggle
+    // Simple and Working Password Strength System
+    const passwordInput = document.getElementById('registerPassword');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthLabel = document.getElementById('strengthLabel');
+    const strengthCount = document.getElementById('strengthCount');
+    const reqLength = document.getElementById('req-length');
+    const reqUppercase = document.getElementById('req-uppercase');
+    const reqNumber = document.getElementById('req-number');
+    const reqSpecial = document.getElementById('req-special');
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            checkPasswordStrength(password);
+        });
+        
+        // Initialize with empty password
+        checkPasswordStrength('');
+    }
+    
+    function checkPasswordStrength(password) {
+        // Check each requirement
+        const hasLength = password.length >= 8;
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasNumber = /\d/.test(password);
+        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        
+        // Update requirement visual states
+        updateRequirement(reqLength, hasLength);
+        updateRequirement(reqUppercase, hasUppercase);
+        updateRequirement(reqNumber, hasNumber);
+        updateRequirement(reqSpecial, hasSpecial);
+        
+        // Count valid requirements
+        const validCount = [hasLength, hasUppercase, hasNumber, hasSpecial].filter(Boolean).length;
+        
+        // Update counter
+        if (strengthCount) {
+            strengthCount.textContent = `${validCount}/4`;
+        }
+        
+        // Update strength level and progress bar
+        let strengthLevel = 'weak';
+        let strengthText = 'Weak';
+        
+        if (validCount <= 1) {
+            strengthLevel = 'weak';
+            strengthText = 'Weak';
+        } else if (validCount <= 3) {
+            strengthLevel = 'medium';
+            strengthText = 'Medium';
+        } else {
+            strengthLevel = 'strong';
+            strengthText = 'Strong';
+        }
+        
+        // Update progress bar
+        if (strengthBar) {
+            strengthBar.className = `strength-fill ${strengthLevel}`;
+        }
+        
+        // Update label
+        if (strengthLabel) {
+            strengthLabel.textContent = password ? `${strengthText} Password` : 'Password strength';
+            strengthLabel.className = `strength-label ${password ? strengthLevel : ''}`;
+        }
+    }
+    
+    function updateRequirement(element, isValid) {
+        if (!element) return;
+        
+        if (isValid) {
+            element.classList.add('valid');
+            element.classList.remove('invalid');
+        } else {
+            element.classList.remove('valid');
+            element.classList.add('invalid');
+        }
+    }
+    
+    // Enhanced Password Toggle Functionality
     const togglePasswordBtns = document.querySelectorAll('.toggle-password');
     
     togglePasswordBtns.forEach(btn => {
@@ -70,73 +150,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const passwordInput = document.getElementById(targetId);
             const icon = this.querySelector('i');
             
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+            if (passwordInput && icon) {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                    this.classList.add('visible');
+                    this.title = 'Hide password';
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                    this.classList.remove('visible');
+                    this.title = 'Show password';
+                }
             }
         });
     });
-    
-    // Password strength indicator
-    const passwordInput = document.getElementById('registerPassword');
-    const strengthBar = document.querySelector('.strength-fill');
-    const strengthText = document.querySelector('.strength-text');
-    
-    if (passwordInput) {
-        passwordInput.addEventListener('input', function() {
-            const password = this.value;
-            const strength = calculatePasswordStrength(password);
-            updatePasswordStrength(strength);
-        });
-    }
-    
-    function calculatePasswordStrength(password) {
-        let score = 0;
-        const checks = {
-            length: password.length >= 8,
-            lowercase: /[a-z]/.test(password),
-            uppercase: /[A-Z]/.test(password),
-            numbers: /\d/.test(password),
-            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
-        };
-        
-        score = Object.values(checks).filter(Boolean).length;
-        
-        return {
-            score: score,
-            percentage: (score / 5) * 100,
-            text: getStrengthText(score)
-        };
-    }
-    
-    function getStrengthText(score) {
-        const strengthLevels = ['Very Weak 🔴', 'Weak 🔴', 'Medium 🟡', 'Good 🟢', 'Strong 🟢'];
-        return strengthLevels[score] || 'Very Weak 🔴';
-    }
-    
-    function updatePasswordStrength(strength) {
-        if (strengthBar && strengthText) {
-            strengthBar.style.width = strength.percentage + '%';
-            strengthText.textContent = strength.text;
-            
-            // Remove existing classes
-            strengthBar.classList.remove('weak', 'medium', 'strong');
-            
-            // Add appropriate class based on strength
-            if (strength.score <= 2) {
-                strengthBar.classList.add('weak');
-            } else if (strength.score <= 3) {
-                strengthBar.classList.add('medium');
-            } else {
-                strengthBar.classList.add('strong');
-            }
-        }
-    }
     
     // Enhanced form validation
     function validateEmail(email) {
@@ -257,7 +287,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 simulateFormSubmission(submitBtn, 'Signing in...', () => {
                     alert('Login successful! Redirecting to dashboard...');
                     // Here you would typically redirect to the main app
-                    console.log('Login data:', { email, password });
                 });
             }
         });
@@ -300,9 +329,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!password) {
                 showError('registerPassword', 'Password is required');
                 isValid = false;
-            } else if (!validatePassword(password)) {
-                showError('registerPassword', 'Password must be at least 8 characters long');
-                isValid = false;
+            } else {
+                const passwordValidation = validatePassword(password);
+                if (!passwordValidation.isValid) {
+                    showError('registerPassword', passwordValidation.errors);
+                    isValid = false;
+                }
             }
             
             // Check terms agreement
@@ -316,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 simulateFormSubmission(submitBtn, 'Creating account...', () => {
                     alert('Registration successful! Welcome to CareerAI!');
                     // Here you would typically redirect to onboarding or dashboard
-                    console.log('Registration data:', { name, email, password });
+
                 });
             }
         });
@@ -331,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 simulateFormSubmission(this, 'Starting guest session...', () => {
                     alert('Welcome! You\'re now browsing as a guest.');
                     // Redirect to limited dashboard or main app
-                    console.log('Guest access granted');
+
                 });
             }
         });
@@ -346,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             simulateFormSubmission(this, `Connecting to ${provider}...`, () => {
                 alert(`${provider} authentication would be handled here.`);
-                console.log(`${provider} login initiated`);
+
             });
         });
     });
@@ -446,5 +478,70 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize animations
     animateShapes();
+    
+    // Mobile Menu Toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (mobileMenuToggle && navMenu) {
+        mobileMenuToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            this.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!mobileMenuToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+            }
+        });
+
+        // Close mobile menu when clicking nav links
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                navMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+            });
+        });
+    }
+
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    
+    if (themeToggle) {
+        // Check for saved theme preference or default to dark theme
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.body.className = `theme-${currentTheme}`;
+        
+        // Update theme toggle icon
+        updateThemeIcon(currentTheme);
+        
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = document.body.className.includes('theme-light') ? 'light' : 'dark';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.body.className = `theme-${newTheme}`;
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+    }
+
+    function updateThemeIcon(theme) {
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i');
+            if (theme === 'light') {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        }
+    }
+    
+    } catch (error) {
+        console.error('Error in auth script:', error);
+    }
     
 });
