@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             strengthLevel = 'strong';
-            feedbackText = 'Strong password! Great job. 🎉';
+            feedbackText = 'Strong password! Great job.';
             if (weakLevel) weakLevel.classList.add('active');
             if (mediumLevel) mediumLevel.classList.add('active');
             if (strongLevel) strongLevel.classList.add('active');
