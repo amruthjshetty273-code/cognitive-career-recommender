@@ -102,7 +102,7 @@
             <div class="auth-card">
                 <!-- Tab Navigation -->
                 <div class="tab-navigation">
-                    <button class="tab-btn" data-tab="login" id="loginTab" onclick="switchToTab('login'); window.location.hash='login';">
+                    <button class="tab-btn active" data-tab="login" id="loginTab" onclick="switchToTab('login'); window.location.hash='login';">
                         <i class="fas fa-sign-in-alt"></i>
                         Login
                     </button>
@@ -116,13 +116,13 @@
                 <div class="forms-container">
                     
                     <!-- Login Form -->
-                    <div class="form-wrapper" id="login-form">
+                    <div class="form-wrapper active" id="login-form">
                         <div class="form-header">
                             <h2>Welcome Back!</h2>
                             <p>Sign in to your account to continue</p>
                         </div>
                         
-                        <form class="auth-form" id="loginForm">
+                        <form class="auth-form" id="loginForm" novalidate>
                             <div class="input-group">
                                 <div class="input-wrapper">
                                     <i class="fas fa-envelope input-icon"></i>
@@ -135,7 +135,7 @@
                                 <div class="input-wrapper">
                                     <i class="fas fa-lock input-icon"></i>
                                     <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
-                                    <button type="button" class="toggle-password" data-target="loginPassword">
+                                    <button type="button" class="toggle-password" data-target="loginPassword" title="Show/Hide password">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
@@ -144,11 +144,11 @@
 
                             <div class="form-options">
                                 <label class="checkbox-wrapper">
-                                    <input type="checkbox" id="rememberMe">
+                                    <input type="checkbox" id="rememberMe" name="rememberMe">
                                     <span class="checkmark"></span>
                                     Remember me
                                 </label>
-                                <a href="#" class="forgot-link">Forgot password?</a>
+                                <a href="#" class="forgot-link" tabindex="0" role="button" aria-label="Reset your password">Forgot password?</a>
                             </div>
 
                             <button type="submit" class="btn btn-primary">
@@ -165,7 +165,7 @@
                             <p>Join thousands who've transformed their careers with intelligent guidance</p>
                         </div>
                         
-                        <form class="auth-form" id="registerForm">
+                        <form class="auth-form" id="registerForm" novalidate>
                             <div class="input-group">
                                 <div class="input-wrapper">
                                     <i class="fas fa-user input-icon"></i>
@@ -225,9 +225,9 @@
 
                             <div class="form-options">
                                 <label class="checkbox-wrapper">
-                                    <input type="checkbox" id="agreeTerms" required>
+                                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
                                     <span class="checkmark"></span>
-                                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                                    I agree to the <a href="#" tabindex="-1">Terms of Service</a> and <a href="#" tabindex="-1">Privacy Policy</a>
                                 </label>
                             </div>
 
@@ -255,16 +255,16 @@
                 <div class="social-login">
                     <h4>Quick Sign In</h4>
                     <div class="social-buttons">
-                        <button class="social-btn google-btn">
-                            <i class="fab fa-google"></i>
+                        <button type="button" class="social-btn google-btn" aria-label="Sign in with Google">
+                            <i class="fab fa-google" aria-hidden="true"></i>
                             Google
                         </button>
-                        <button class="social-btn linkedin-btn">
-                            <i class="fab fa-linkedin"></i>
+                        <button type="button" class="social-btn linkedin-btn" aria-label="Sign in with LinkedIn">
+                            <i class="fab fa-linkedin" aria-hidden="true"></i>
                             LinkedIn
                         </button>
-                        <button class="social-btn microsoft-btn">
-                            <i class="fab fa-microsoft"></i>
+                        <button type="button" class="social-btn microsoft-btn" aria-label="Sign in with Microsoft">
+                            <i class="fab fa-microsoft" aria-hidden="true"></i>
                             Microsoft
                         </button>
                     </div>
