@@ -320,21 +320,79 @@ body {
 
 /* Password Strength */
 .password-strength {
-    margin-top: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.strength-levels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+}
+
+.strength-level {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+    flex: 1;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+.strength-level.active {
     opacity: 1;
-    visibility: visible;
-    display: block;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.strength-level.weak.active {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+.strength-level.medium.active {
+    background: #fffbeb;
+    border-color: #fed7aa;
+    color: #d97706;
+}
+
+.strength-level.strong.active {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #16a34a;
+}
+
+.level-dot {
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+.level-text {
+    font-weight: 500;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .strength-bar {
     width: 100%;
-    height: 6px;
+    height: 4px;
     background: #e2e8f0;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
     margin-bottom: 0.5rem;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-    border: 1px solid #cbd5e1;
 }
 
 .strength-fill {
@@ -342,32 +400,32 @@ body {
     width: 0%;
     background: #e2e8f0;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 3px;
-    min-width: 0;
+    border-radius: 2px;
 }
 
 .strength-fill.weak {
-    background: linear-gradient(90deg, #ef4444, #dc2626);
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+    background: #ef4444;
+    width: 33%;
 }
 
 .strength-fill.medium {
-    background: linear-gradient(90deg, #f59e0b, #eab308);
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+    background: #f59e0b;
+    width: 66%;
 }
 
 .strength-fill.strong {
-    background: linear-gradient(90deg, #10b981, #059669);
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+    background: #10b981;
+    width: 100%;
 }
 
-.strength-text {
-    font-size: 0.8rem;
+.strength-feedback {
+    text-align: center;
+}
+
+.feedback-text {
+    font-size: 0.75rem;
     color: #64748b;
-    font-weight: 500;
-    text-align: left;
-    line-height: 1.2;
-    display: block;
+    font-weight: 400;
 }
 
 /* Form Options */

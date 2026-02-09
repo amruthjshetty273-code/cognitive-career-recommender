@@ -190,11 +190,27 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
-                                <div class="password-strength">
-                                    <div class="strength-bar">
-                                        <div class="strength-fill"></div>
+                                <div class="password-strength" id="passwordStrength">
+                                    <div class="strength-levels">
+                                        <div class="strength-level weak" id="weakLevel">
+                                            <span class="level-dot">🔴</span>
+                                            <span class="level-text">Weak</span>
+                                        </div>
+                                        <div class="strength-level medium" id="mediumLevel">
+                                            <span class="level-dot">🟡</span>
+                                            <span class="level-text">Medium</span>
+                                        </div>
+                                        <div class="strength-level strong" id="strongLevel">
+                                            <span class="level-dot">🟢</span>
+                                            <span class="level-text">Strong</span>
+                                        </div>
                                     </div>
-                                    <span class="strength-text">Password strength</span>
+                                    <div class="strength-bar">
+                                        <div class="strength-fill" id="strengthFill"></div>
+                                    </div>
+                                    <div class="strength-feedback" id="strengthFeedback">
+                                        <span class="feedback-text">Enter password to see strength</span>
+                                    </div>
                                 </div>
                                 <span class="error-message" id="registerPasswordError"></span>
                             </div>

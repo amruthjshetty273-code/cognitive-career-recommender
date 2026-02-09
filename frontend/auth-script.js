@@ -84,28 +84,40 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Password strength indicator
     const passwordInput = document.getElementById('registerPassword');
-    const strengthBar = document.querySelector('.strength-fill');
-    const strengthText = document.querySelector('.strength-text');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthFeedback = document.querySelector('.feedback-text');
+    const weakLevel = document.getElementById('weakLevel');
+    const mediumLevel = document.getElementById('mediumLevel');
+    const strongLevel = document.getElementById('strongLevel');
     
-    // Debug: Check if elements are found
-    console.log('Password input found:', !!passwordInput);
-    console.log('Strength bar found:', !!strengthBar);
-    console.log('Strength text found:', !!strengthText);
-    
-    if (passwordInput && strengthBar && strengthText) {
+    if (passwordInput) {
         passwordInput.addEventListener('input', function() {
             const password = this.value;
-            const strength = calculatePasswordStrength(password);
-            updatePasswordStrength(strength);
+            updatePasswordStrengthLevels(password);
         });
         
         // Initial state
-        updatePasswordStrength({ score: 0, percentage: 0, text: 'Password strength' });
+        updatePasswordStrengthLevels('');
     }
     
-    function calculatePasswordStrength(password) {
-        let score = 0;
-        const checks = {
+    function updatePasswordStrengthLevels(password) {
+        if (!password || password.length === 0) {
+            // Reset all levels
+            if (weakLevel) weakLevel.classList.remove('active');
+            if (mediumLevel) mediumLevel.classList.remove('active');
+            if (strongLevel) strongLevel.classList.remove('active');
+            if (strengthFill) {
+                strengthFill.style.width = '0%';
+                strengthFill.classList.remove('weak', 'medium', 'strong');
+            }
+            if (strengthFeedback) {
+                strengthFeedback.textContent = 'Enter password to see strength';
+            }
+            return;
+        }
+        
+        // Calculate strength criteria
+        const criteria = {
             length: password.length >= 8,
             lowercase: /[a-z]/.test(password),
             uppercase: /[A-Z]/.test(password),
@@ -113,56 +125,59 @@ document.addEventListener('DOMContentLoaded', function() {
             special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
         };
         
-        score = Object.values(checks).filter(Boolean).length;
+        const score = Object.values(criteria).filter(Boolean).length;
         
-        return {
-            score: score,
-            percentage: (score / 5) * 100,
-            text: getStrengthText(score)
-        };
-    }
-    
-    function getStrengthText(score) {
-        const strengthLevels = {
-            0: 'Password strength',
-            1: 'Very Weak',
-            2: 'Weak', 
-            3: 'Medium',
-            4: 'Good',
-            5: 'Strong'
-        };
-        return strengthLevels[score] || 'Password strength';
-    }
-    
-    function updatePasswordStrength(strength) {
-        if (strengthBar && strengthText) {
-            // Update width
-            strengthBar.style.width = strength.percentage + '%';
-            
-            // Update text
-            strengthText.textContent = strength.text;
-            
-            // Remove existing classes
-            strengthBar.classList.remove('weak', 'medium', 'strong');
-            
-            // Add appropriate class based on strength
-            if (strength.score <= 2) {
-                strengthBar.classList.add('weak');
-            } else if (strength.score <= 3) {
-                strengthBar.classList.add('medium');
-            } else {
-                strengthBar.classList.add('strong');
-            }
-            
-            // Debug output
-            console.log('Password strength updated:', {
-                score: strength.score,
-                percentage: strength.percentage,
-                text: strength.text
-            });
-        } else {
-            console.log('Strength elements not found for update');
+        // Reset all levels
+        if (weakLevel) weakLevel.classList.remove('active');
+        if (mediumLevel) mediumLevel.classList.remove('active');
+        if (strongLevel) strongLevel.classList.remove('active');
+        
+        // Update levels and bar based on score
+        if (strengthFill) {
+            strengthFill.classList.remove('weak', 'medium', 'strong');
         }
+        
+        let strengthLevel = '';
+        let feedbackText = '';
+        
+        if (score <= 2) {
+            strengthLevel = 'weak';
+            feedbackText = `Weak password. Add ${3-score} more requirements.`;
+            if (weakLevel) weakLevel.classList.add('active');
+            if (strengthFill) {
+                strengthFill.classList.add('weak');
+                strengthFill.style.width = '33%';
+            }
+        } else if (score <= 3) {
+            strengthLevel = 'medium';
+            feedbackText = `Medium strength. Add ${5-score} more for strong password.`;
+            if (weakLevel) weakLevel.classList.add('active');
+            if (mediumLevel) mediumLevel.classList.add('active');
+            if (strengthFill) {
+                strengthFill.classList.add('medium');
+                strengthFill.style.width = '66%';
+            }
+        } else {
+            strengthLevel = 'strong';
+            feedbackText = 'Strong password! Great job. 🎉';
+            if (weakLevel) weakLevel.classList.add('active');
+            if (mediumLevel) mediumLevel.classList.add('active');
+            if (strongLevel) strongLevel.classList.add('active');
+            if (strengthFill) {
+                strengthFill.classList.add('strong');
+                strengthFill.style.width = '100%';
+            }
+        }
+        
+        if (strengthFeedback) {
+            strengthFeedback.textContent = feedbackText;
+        }
+        
+        console.log('Password strength:', {
+            score: score,
+            level: strengthLevel,
+            criteria: criteria
+        });
     }
     
     // Enhanced form validation
