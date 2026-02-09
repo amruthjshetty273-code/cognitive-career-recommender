@@ -9,13 +9,13 @@
       "destination": "/frontend/auth.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/frontend/$1"
+      "source": "/:path*",
+      "destination": "/frontend/:path*"
     }
   ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "headers": [
         {
           "key": "X-Content-Type-Options",
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2))$",
+      "source": "/frontend/:path*",
       "headers": [
         {
           "key": "Cache-Control",
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(html))$",
+      "source": "/frontend/:path*.html",
       "headers": [
         {
           "key": "Cache-Control",
