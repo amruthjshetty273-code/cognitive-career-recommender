@@ -191,36 +191,31 @@
                                     </button>
                                 </div>
                                 
-                                <!-- Smart Password Strength System -->
-                                <div class="smart-password-strength" id="passwordStrengthContainer">
-                                    <!-- Progress Bar -->
-                                    <div class="strength-progress">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" id="progressFill"></div>
-                                        </div>
-                                        <div class="strength-status" id="strengthStatus">
-                                            <span class="status-text" id="statusText">Enter password</span>
-                                            <span class="status-icon" id="statusIcon"></span>
-                                        </div>
+                                <!-- Password Strength Indicator -->
+                                <div class="password-strength-system">
+                                    <div class="strength-progress-bar">
+                                        <div class="strength-fill" id="strengthBar"></div>
                                     </div>
-                                    
-                                    <!-- Intelligence Rules Checklist -->
-                                    <div class="rules-checklist" id="rulesChecklist">
-                                        <div class="rule-item" id="lengthRule">
-                                            <i class="rule-icon fas fa-times"></i>
-                                            <span class="rule-text">At least 8 characters</span>
+                                    <div class="strength-status">
+                                        <span class="strength-label" id="strengthLabel">Password strength</span>
+                                        <span class="strength-count" id="strengthCount">0/4</span>
+                                    </div>
+                                    <div class="strength-requirements">
+                                        <div class="requirement" id="req-length">
+                                            <i class="req-icon fas fa-times"></i>
+                                            <span>8+ characters</span>
                                         </div>
-                                        <div class="rule-item" id="uppercaseRule">
-                                            <i class="rule-icon fas fa-times"></i>
-                                            <span class="rule-text">One uppercase letter</span>
+                                        <div class="requirement" id="req-uppercase">
+                                            <i class="req-icon fas fa-times"></i>
+                                            <span>Uppercase letter</span>
                                         </div>
-                                        <div class="rule-item" id="numberRule">
-                                            <i class="rule-icon fas fa-times"></i>
-                                            <span class="rule-text">One number</span>
+                                        <div class="requirement" id="req-number">
+                                            <i class="req-icon fas fa-times"></i>
+                                            <span>Number</span>
                                         </div>
-                                        <div class="rule-item" id="specialRule">
-                                            <i class="rule-icon fas fa-times"></i>
-                                            <span class="rule-text">One special character (!@#$%)</span>
+                                        <div class="requirement" id="req-special">
+                                            <i class="req-icon fas fa-times"></i>
+                                            <span>Special character</span>
                                         </div>
                                     </div>
                                 </div>
