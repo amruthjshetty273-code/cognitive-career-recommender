@@ -1,8 +1,6 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     
-    console.log('Auth script loaded successfully');
-    
     try {
         // Check for hash in URL and activate appropriate tab
         function handleInitialTab() {
@@ -73,17 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const reqNumber = document.getElementById('req-number');
     const reqSpecial = document.getElementById('req-special');
     
-    console.log('Password elements found:', {
-        input: !!passwordInput,
-        bar: !!strengthBar,
-        label: !!strengthLabel,
-        count: !!strengthCount,
-        reqLength: !!reqLength,
-        reqUppercase: !!reqUppercase,
-        reqNumber: !!reqNumber,
-        reqSpecial: !!reqSpecial
-    });
-    
     if (passwordInput) {
         passwordInput.addEventListener('input', function() {
             const password = this.value;
@@ -140,16 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
             strengthLabel.textContent = password ? `${strengthText} Password` : 'Password strength';
             strengthLabel.className = `strength-label ${password ? strengthLevel : ''}`;
         }
-        
-        console.log('Password strength check:', {
-            password: password.length > 0 ? '[HIDDEN]' : 'empty',
-            hasLength,
-            hasUppercase,
-            hasNumber,
-            hasSpecial,
-            validCount,
-            strengthLevel
-        });
     }
     
     function updateRequirement(element, isValid) {
@@ -310,7 +287,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 simulateFormSubmission(submitBtn, 'Signing in...', () => {
                     alert('Login successful! Redirecting to dashboard...');
                     // Here you would typically redirect to the main app
-                    console.log('Login data:', { email, password });
                 });
             }
         });
@@ -372,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 simulateFormSubmission(submitBtn, 'Creating account...', () => {
                     alert('Registration successful! Welcome to CareerAI!');
                     // Here you would typically redirect to onboarding or dashboard
-                    console.log('Registration data:', { name, email, password });
+
                 });
             }
         });
@@ -387,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 simulateFormSubmission(this, 'Starting guest session...', () => {
                     alert('Welcome! You\'re now browsing as a guest.');
                     // Redirect to limited dashboard or main app
-                    console.log('Guest access granted');
+
                 });
             }
         });
@@ -402,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             simulateFormSubmission(this, `Connecting to ${provider}...`, () => {
                 alert(`${provider} authentication would be handled here.`);
-                console.log(`${provider} login initiated`);
+
             });
         });
     });
