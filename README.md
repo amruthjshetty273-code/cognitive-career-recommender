@@ -51,5 +51,3 @@ backend/
 - **Roadmap** - 12-month plan
 - **Reports** - Download insights
 - **Settings** - Account options
-
-## Built by Team AKATSUKI

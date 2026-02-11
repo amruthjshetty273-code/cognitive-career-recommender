@@ -1,0 +1,20 @@
+
+============================================================
+  CareerAI - Cognitive Career Recommendation System
+============================================================
+
+Server starting on http://localhost:5000
+
+Available routes:
+  Home        ➜ http://localhost:5000/
+  Login       ➜ http://localhost:5000/login
+  Register    ➜ http://localhost:5000/register
+  Demo        ➜ http://localhost:5000/demo
+  Dashboard   ➜ http://localhost:5000/dashboard
+
+============================================================
+
+ * Serving Flask app 'simple_app'
+ * Debug mode: on
+Address already in use
+Port 5000 is in use by another program. Either identify and stop that program, or start the server with a different port.
