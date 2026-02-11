@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Resume - CareerAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            padding: 2rem;
+        }
+        .upload-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+        .upload-zone:hover {
+            background: #e3f2fd;
+            border-color: #764ba2;
+        }
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h1 class="text-center mb-4"><i class="fas fa-cloud-upload-alt text-primary"></i> Upload Your Resume</h1>
+        <p class="text-center text-muted mb-4">Upload your resume to get AI-powered career recommendations</p>
+        
+        <form action="/upload_resume" method="POST" enctype="multipart/form-data">
+            <div class="upload-zone mb-4">
+                <div class="upload-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <h4>Drag & Drop Your Resume Here</h4>
+                <p class="text-muted">or click to browse</p>
+                <input type="file" class="form-control" name="resume" accept=".pdf,.doc,.docx,.txt" required>
+                <small class="text-muted">Supported formats: PDF, DOC, DOCX, TXT (Max: 10MB)</small>
+            </div>
+            
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg me-2">
+                    <i class="fas fa-brain me-2"></i>Analyze Resume
+                </button>
+                <a href="/" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-arrow-left me-2"></i>Back
+                </a>
+            </div>
+        </form>
+        
+        <div id="result" class="mt-4"></div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelector('form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i>Analyzing your resume...</div>';
+            
+            try {
+                const response = await fetch('/upload_resume', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${data.error}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-check-circle me-2"></i>Analysis Complete!</h5>
+                            <p><strong>Name:</strong> ${data.personal_info?.name || 'Not found'}</p>
+                            <p><strong>Email:</strong> ${data.personal_info?.email || 'Not found'}</p>
+                            <p><strong>Skills Found:</strong> ${data.skills?.technical_skills?.length || 0} technical skills</p>
+                            <a href="/analyze_profile" class="btn btn-primary mt-2">Get Career Recommendations</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ${error.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

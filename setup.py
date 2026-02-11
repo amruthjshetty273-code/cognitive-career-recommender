@@ -93,41 +93,15 @@ def setup_project():
     directories = [
         "frontend/static/uploads/avatars",
         "frontend/static/uploads/resumes",
-        "backend_new/logs",
+        "backend/data",
+        "backend/data/uploads",
+        "backend/models",
         "tests"
     ]
     
     for directory in directories:
         Path(directory).mkdir(parents=True, exist_ok=True)
     print("✅ Created necessary directories")
-    
-    # Initialize database
-    print("\n🔄 Setting up database...")
-    try:
-        # Import here to avoid import issues
-        from app import create_app
-        from backend_new.models.database import db
-        
-        app = create_app()
-        with app.app_context():
-            db.create_all()
-            print("✅ Database tables created")
-            
-            # Create admin user
-            print("\n👤 Creating admin user...")
-            from backend_new.models.database import db_manager
-            admin = db_manager.create_admin_user(
-                email='admin@cognitivecareer.ai',
-                password='admin123',
-                first_name='Admin',
-                last_name='User'
-            )
-            print("✅ Admin user created (email: admin@cognitivecareer.ai, password: admin123)")
-            print("⚠️  Please change the admin password after first login!")
-            
-    except Exception as e:
-        print(f"❌ Database setup failed: {str(e)}")
-        print("You can set it up manually later with: python app.py init-db")
     
     # Setup completion
     print("\n" + "=" * 50)
@@ -149,22 +123,10 @@ def setup_project():
     print("\n4. Open your browser and go to:")
     print("   http://localhost:5000")
     
-    print("\n5. Login with admin account:")
-    print("   Email: admin@cognitivecareer.ai")
-    print("   Password: admin123")
-    print("   (Change this password immediately!)")
-    
-    print("\n📚 Additional commands:")
-    print("   python app.py init-db     # Initialize database")
-    print("   python app.py reset-db    # Reset database")
-    print("   python app.py seed-db     # Add sample data")
-    print("   python app.py create-admin # Create admin user")
-    print("   python app.py test-email   # Test email configuration")
-    
     print("\n🔧 Configuration files:")
     print("   .env                      # Environment variables")
     print("   requirements.txt          # Python dependencies")
-    print("   README_FRONTEND.md        # Frontend documentation")
+    print("   README.md                 # Project documentation")
 
 if __name__ == "__main__":
     try:
