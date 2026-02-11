@@ -166,23 +166,35 @@ def home():
             }
             
             .btn-secondary-hero:hover {
-                background: rgba(255,255,255,0.3);
-                transform: translateY(-3px);
-                color: white;
+                background: white;
+                color: var(--primary);
                 text-decoration: none;
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
             }
             
             .hero-illustration {
                 text-align: center;
                 animation: float 3s ease-in-out infinite;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
             
             .hero-illustration i {
-                font-size: 12rem;
-                background: linear-gradient(45deg, var(--accent), #ff6b6b);
+                font-size: 18rem;
+                background: linear-gradient(135deg, #FFB703 0%, #FF8800 50%, #FFB703 100%);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
+                filter: drop-shadow(0 20px 40px rgba(255, 183, 3, 0.3));
+                transition: all 0.5s ease;
+            }
+            
+            .hero-illustration i:hover {
+                filter: drop-shadow(0 25px 50px rgba(255, 183, 3, 0.5));
+                transform: scale(1.05);
+            }
                 filter: drop-shadow(0 10px 30px rgba(0,0,0,0.1));
             }
             
@@ -215,14 +227,24 @@ def home():
                 border-radius: 20px;
                 padding: 2.5rem;
                 text-align: center;
-                transition: all 0.3s ease;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 box-shadow: 0 5px 20px rgba(0,0,0,0.05);
                 margin-bottom: 2rem;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                min-height: 400px;
+                border: 2px solid transparent;
             }
             
             .feature-card:hover {
                 transform: translateY(-10px);
-                box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+                box-shadow: 0 20px 50px rgba(108, 99, 255, 0.15);
+                border-color: var(--primary);
+            }
+            
+            .feature-card:hover .feature-icon {
+                animation: pulse 1s ease-in-out;
             }
             
             .feature-icon {
@@ -245,6 +267,7 @@ def home():
                 color: #6c757d;
                 font-size: 1rem;
                 line-height: 1.6;
+                flex-grow: 1;
             }
             
             /* How It Works */
@@ -282,6 +305,11 @@ def home():
                 text-align: center;
                 position: relative;
                 z-index: 1;
+                transition: all 0.3s ease;
+            }
+            
+            .workflow-step:hover {
+                transform: scale(1.08);
             }
             
             .step-number {
@@ -297,14 +325,14 @@ def home():
                 font-weight: 700;
                 margin: 0 auto 1.5rem;
                 box-shadow: 0 10px 30px rgba(108, 99, 255, 0.2);
-                transition: all 0.3s ease;
+                transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
                 position: relative;
                 border: 4px solid white;
             }
             
             .workflow-step:hover .step-number {
-                transform: scale(1.1);
-                box-shadow: 0 15px 40px rgba(108, 99, 255, 0.3);
+                transform: rotate(360deg);
+                box-shadow: 0 15px 40px rgba(108, 99, 255, 0.4);
             }
             
             .step-title {
@@ -317,22 +345,71 @@ def home():
             /* CTA Section */
             .cta-section {
                 background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
+                background-size: 200% 200%;
+                animation: shimmer 10s ease infinite;
                 color: white;
                 padding: 6rem 2rem;
                 text-align: center;
                 margin: 4rem 0;
                 border-radius: 20px;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .cta-section::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                animation: float 6s ease-in-out infinite;
             }
             
             .cta-title {
                 font-size: 2.5rem;
                 font-weight: 800;
                 margin-bottom: 2rem;
+                position: relative;
+                z-index: 1;
+            }
+            
+            .cta-urgency {
+                display: inline-block;
+                background: rgba(255, 183, 3, 0.2);
+                color: var(--accent);
+                padding: 8px 20px;
+                border-radius: 20px;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+                font-size: 0.95rem;
+                position: relative;
+                z-index: 1;
             }
             
             .cta-button {
                 background: var(--accent);
                 color: var(--dark);
+                padding: 18px 45px;
+                font-size: 1.2rem;
+                font-weight: 600;
+                border-radius: 12px;
+                text-decoration: none;
+                display: inline-block;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 8px 25px rgba(255, 183, 3, 0.3);
+                position: relative;
+                z-index: 1;
+            }
+            
+            .cta-button:hover {
+                background: #ff9c00;
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 15px 40px rgba(255, 183, 3, 0.5);
+                color: var(--dark);
+                text-decoration: none;
+            }
                 border: none;
                 padding: 18px 50px;
                 font-size: 1.1rem;
@@ -409,6 +486,35 @@ def home():
                 }
             }
             
+            @keyframes pulse {
+                0%, 100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.05);
+                }
+            }
+            
+            @keyframes shimmer {
+                0% {
+                    background-position: -200% center;
+                }
+                100% {
+                    background-position: 200% center;
+                }
+            }
+            
+            @keyframes countUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
             /* Responsive */
             @media (max-width: 768px) {
                 .hero-title {
@@ -431,7 +537,7 @@ def home():
                 }
                 
                 .hero-illustration i {
-                    font-size: 8rem;
+                    font-size: 12rem;
                 }
                 
                 .section-title {
@@ -479,15 +585,15 @@ def home():
             <div class="container-lg">
                 <div class="row align-items-center">
                     <div class="col-lg-6 hero-content">
-                        <h1 class="hero-title">Discover Your Ideal Career with Cognitive AI</h1>
-                        <p class="hero-subtitle">An intelligent system that understands your skills, predicts career paths, and explains every recommendation with transparent reasoning.</p>
+                        <h1 class="hero-title">AI-Powered Career Recommendations</h1>
+                        <p class="hero-subtitle">A cognitive AI system that analyzes your profile, identifies career matches, and provides explainable reasoning for each recommendation.</p>
                         
                         <div class="hero-buttons">
-                            <a href="/register" class="btn-primary-hero">
-                                <i class="fas fa-rocket"></i> Get Started
+                            <a href="/demo" class="btn-primary-hero">
+                                <i class="fas fa-play-circle"></i> Try Demo
                             </a>
-                            <a href="/demo" class="btn-secondary-hero">
-                                <i class="fas fa-play-circle"></i> Watch Demo
+                            <a href="/login" class="btn-secondary-hero">
+                                <i class="fas fa-sign-in-alt"></i> Login
                             </a>
                         </div>
                     </div>
@@ -499,14 +605,59 @@ def home():
             </div>
         </section>
         
+        <!-- Problem Statement -->
+        <section style="padding: 5rem 0; background: linear-gradient(to bottom, #f8f9fa, white);">
+            <div class="container-lg">
+                <div class="row align-items-center mb-5">
+                    <div class="col-lg-6">
+                        <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">The Challenge</h2>
+                        <p style="font-size: 1.2rem; line-height: 1.8; color: #555; margin-bottom: 2rem;">
+                            Many students face career confusion and uncertainty about their professional path. Traditional career counseling can be expensive and often lacks transparency in how recommendations are made.
+                        </p>
+                        <p style="font-size: 1.1rem; line-height: 1.7; color: #666;">
+                            CareerAI uses <strong>Cognitive Intelligence</strong> to analyze profiles like a career counselor and <strong>Explainable AI (XAI)</strong> to show exactly why each recommendation is made.
+                        </p>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="row text-center">
+                            <div class="col-6 mb-4">
+                                <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); animation: countUp 1s ease;">
+                                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;"><i class="fas fa-brain"></i></div>
+                                    <p style="color: #666; font-weight: 600;">Cognitive AI Analysis</p>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-4">
+                                <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); animation: countUp 1s ease 0.2s both;">
+                                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-eye"></i></div>
+                                    <p style="color: #666; font-weight: 600;">Explainable Reasoning</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); animation: countUp 1s ease 0.4s both;">
+                                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent); margin-bottom: 0.5rem;"><i class="fas fa-road"></i></div>
+                                    <p style="color: #666; font-weight: 600;">Learning Roadmap</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); animation: countUp 1s ease 0.6s both;">
+                                    <div style="font-size: 2.5rem; font-weight: 800; color: #e74c3c; margin-bottom: 0.5rem;"><i class="fas fa-chart-gap"></i></div>
+                                    <p style="color: #666; font-weight: 600;">Skill Gap Analysis</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
         <!-- Features Section -->
         <section class="features-section" id="features">
             <div class="container-lg">
-                <h2 class="section-title">Advanced Capabilities</h2>
-                <p class="section-subtitle">Three pillars of intelligent career recommendation</p>
+                <h2 class="section-title">Cognitive AI Features</h2>
+                <p class="section-subtitle">Two core pillars that power intelligent career recommendations</p>
                 
-                <div class="row">
-                    <div class="col-lg-4 col-md-6">
+                <div class="row justify-content-center">
+                    <div class="col-lg-5 col-md-6 mb-4">
                         <div class="feature-card">
                             <div class="feature-icon">
                                 <i class="fas fa-brain"></i>
@@ -517,7 +668,7 @@ def home():
                         </div>
                     </div>
                     
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-5 col-md-6 mb-4">
                         <div class="feature-card">
                             <div class="feature-icon">
                                 <i class="fas fa-eye"></i>
@@ -527,17 +678,6 @@ def home():
                             <p class="feature-text">Transparency is built-in. Every recommendation comes with detailed explanations of the reasoning, so you understand exactly why CareerAI suggests each career path.</p>
                         </div>
                     </div>
-                    
-                    <div class="col-lg-4 col-md-6">
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
-                            <h3 class="feature-title">Smart Matching</h3>
-                            <p style="font-size: 0.9rem; color: #667eea; font-weight: 600; margin: 0.5rem 0;">Matches skills with real-world job trends.</p>
-                            <p class="feature-text">Our AI analyzes current job market data and industry trends to match your qualifications with emerging opportunities and future-proof career paths.</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -545,44 +685,79 @@ def home():
         <!-- How It Works -->
         <section class="workflow-section" id="workflow">
             <div class="container-lg workflow-container">
-                <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">Simple 5-step process to discover your ideal career</p>
+                <h2 class="section-title">The Cognitive Loop</h2>
+                <p class="section-subtitle">7-step intelligent reasoning process</p>
                 
                 <div class="workflow-steps">
                     <div class="workflow-step">
                         <div class="step-number">1</div>
-                        <p class="step-title">Build Your Profile</p>
+                        <p class="step-title">Input Profile</p>
                     </div>
                     <div class="workflow-step">
                         <div class="step-number">2</div>
-                        <p class="step-title">Analyze Skills (NLP)</p>
+                        <p class="step-title">NLP Analysis</p>
                     </div>
                     <div class="workflow-step">
                         <div class="step-number">3</div>
-                        <p class="step-title">Cognitive Reasoning</p>
+                        <p class="step-title">Cognitive Mapping</p>
                     </div>
                     <div class="workflow-step">
                         <div class="step-number">4</div>
-                        <p class="step-title">Career Prediction</p>
+                        <p class="step-title">AI Reasoning</p>
                     </div>
                     <div class="workflow-step">
                         <div class="step-number">5</div>
-                        <p class="step-title">Explain & Feedback</p>
+                        <p class="step-title">Career Match</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">6</div>
+                        <p class="step-title">XAI Explanation</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">7</div>
+                        <p class="step-title">Feedback Loop</p>
                     </div>
                 </div>
             </div>
         </section>
         
-        <!-- CTA Section -->
-        <div class="container-lg">
-            <div class="cta-section">
-                <h2 class="cta-title">Start Your AI-Powered Career Journey</h2>
-                <p style="font-size: 1.2rem; opacity: 0.95;">Let Cognitive AI guide you to the right career with transparent and personalized recommendations based on deep understanding of your profile.</p>
-                <a href="/register" class="cta-button">
-                    <i class="fas fa-arrow-right"></i> Create Free Account
-                </a>
+        <!-- System Features -->
+        <section style="padding: 5rem 0; background: #f8f9fa;">
+            <div class="container-lg">
+                <h2 class="section-title">What's Inside</h2>
+                <p class="section-subtitle">Key features of the CareerAI system</p>
+                <div class="row mt-5">
+                    <div class="col-md-3 mb-4">
+                        <div style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 10px 30px rgba(108,99,255,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow='0 5px 15px rgba(0,0,0,0.08)'">
+                            <i class="fas fa-chart-line" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                            <h5 style="font-weight: 600; margin-bottom: 0.5rem;">Profile Analysis</h5>
+                            <p style="color: #666; font-size: 0.9rem;">Deep skill & interest insights</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 10px 30px rgba(0,191,166,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow='0 5px 15px rgba(0,0,0,0.08)'">
+                            <i class="fas fa-bullseye" style="font-size: 2.5rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+                            <h5 style="font-weight: 600; margin-bottom: 0.5rem;">Top 3 Careers</h5>
+                            <p style="color: #666; font-size: 0.9rem;">AI-matched recommendations</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 10px 30px rgba(255,183,3,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow='0 5px 15px rgba(0,0,0,0.08)'">
+                            <i class="fas fa-lightbulb" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                            <h5 style="font-weight: 600; margin-bottom: 0.5rem;">XAI Reasoning</h5>
+                            <p style="color: #666; font-size: 0.9rem;">Why each career fits you</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 10px 30px rgba(231,76,60,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow='0 5px 15px rgba(0,0,0,0.08)'">
+                            <i class="fas fa-road" style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+                            <h5 style="font-weight: 600; margin-bottom: 0.5rem;">Learning Roadmap</h5>
+                            <p style="color: #666; font-size: 0.9rem;">Step-by-step skill path</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
         
         <!-- Footer -->
         <footer>
@@ -593,21 +768,22 @@ def home():
                         <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem; font-size: 0.95rem;">AI-powered cognitive career recommendation platform.</p>
                         <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; line-height: 1.6;">Helping students and professionals discover the right career path using Cognitive AI and Explainable AI technologies.</p>
                     </div>
-                    <div class="col-lg-3 col-md-6 footer-content">
+                    <div class="col-lg-4 col-md-6 footer-content">
                         <h5 class="footer-title">Product</h5>
                         <a href="/demo" class="footer-link">Demo</a>
-                        <a href="#features" class="footer-link">Advanced Capabilities</a>
-                        <a href="#workflow" class="footer-link">How It Works</a>
-                        <a href="/dashboard" class="footer-link">Dashboard</a>
+                        <a href="#features" class="footer-link">Features</a>
+                        <a href="#workflow" class="footer-link">Cognitive Loop</a>
                     </div>
-                    <div class="col-lg-3 col-md-6 footer-content">
-                        <h5 class="footer-title">Academic Project</h5>
-                        <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-bottom: 1rem;">Cognitive AI System</p>
-                        <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; line-height: 1.6;">This project demonstrates cognitive reasoning with ML, NLP, and explainable AI for real-world career guidance.</p>
+                    <div class="col-lg-4 col-md-6 footer-content">
+                        <h5 class="footer-title">Resources</h5>
+                        <a href="#" class="footer-link">Documentation</a>
+                        <a href="#" class="footer-link">API Reference</a>
+                        <a href="#" class="footer-link">Support</a>
+                        <a href="#" class="footer-link">FAQ</a>
                     </div>
-                    <div class="col-lg-3 col-md-6 footer-content">
-                        <h5 class="footer-title">Technology Stack</h5>
-                        <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; line-height: 1.8;"><strong>NLP:</strong> Natural Language Processing<br><strong>ML:</strong> Machine Learning<br><strong>XAI:</strong> Explainable AI<br><strong>Tech:</strong> Python, Flask, scikit-learn</p>
+                    <div class="col-lg-4 col-md-6 footer-content">
+                        <h5 class="footer-title">About</h5>
+                        <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; line-height: 1.8;">Built as a Cognitive AI Project<br>NLP, ML & Explainable AI<br>Academic Research</p>
                     </div>
                 </div>
                 
@@ -816,11 +992,16 @@ def login():
                 <!-- Left Side - Illustration -->
                 <div class="auth-illustration">
                     <div class="illustration-icon">
-                        <i class="fas fa-sign-in-alt"></i>
+                        <i class="fas fa-brain"></i>
                     </div>
                     <div class="illustration-text">
-                        <h2>Welcome Back</h2>
-                        <p>Log in to your account and continue discovering your perfect career path with AI-powered insights.</p>
+                        <h2>Welcome Back to CareerAI</h2>
+                        <p>Continue your journey to finding the perfect career with our Cognitive AI-powered platform.</p>
+                        <ul style="text-align: left; margin-top: 2rem; list-style: none; padding: 0;">
+                            <li style="margin-bottom: 1rem;"><i class="fas fa-check-circle" style="color: var(--accent); margin-right: 0.5rem;"></i> Explainable AI recommendations</li>
+                            <li style="margin-bottom: 1rem;"><i class="fas fa-check-circle" style="color: var(--accent); margin-right: 0.5rem;"></i> Personalized career roadmap</li>
+                            <li style="margin-bottom: 1rem;"><i class="fas fa-check-circle" style="color: var(--accent); margin-right: 0.5rem;"></i> Real-time skill gap analysis</li>
+                        </ul>
                     </div>
                 </div>
                 
@@ -831,13 +1012,21 @@ def login():
                     
                     <form action="/auth" method="POST">
                         <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-control" name="email" placeholder="you@example.com" required>
+                            <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+                            <input type="email" class="form-control" name="email" placeholder="you@example.com" required style="transition: all 0.3s ease;">
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control" name="password" placeholder="Enter your password" required>
+                            <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" class="form-control" name="password" placeholder="Enter your password" required style="transition: all 0.3s ease;">
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <label style="display: flex; align-items: center; color: #6c757d; cursor: pointer; font-size: 0.95rem;">
+                                <input type="checkbox" name="remember" style="margin-right: 0.5rem; cursor: pointer;">
+                                Remember me
+                            </label>
+                            <a href="/forgot-password" style="color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease;">Forgot Password?</a>
                         </div>
                         
                         <button type="submit" class="btn-login">
@@ -853,6 +1042,21 @@ def login():
         </div>
         
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Form field focus animation
+            document.querySelectorAll('.form-control').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'scale(1.01)';
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(108, 99, 255, 0.1)';
+                });
+                input.addEventListener('blur', function() {
+                    this.style.transform = '';
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                });
+            });
+        </script>
     </body>
     </html>
     '''
@@ -1053,57 +1257,73 @@ def register():
             <div class="auth-wrapper">
                 <!-- Left Side - Benefits -->
                 <div class="auth-benefits">
-                    <h2 class="benefits-title">Why Choose CareerAI?</h2>
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <i class="fas fa-brain" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                        <h2 class="benefits-title">CareerAI System</h2>
+                        <p style="opacity: 0.9; font-size: 1.1rem; margin-bottom: 0;">Cognitive AI-Powered Career Recommendation Platform</p>
+                    </div>
                     
                     <div class="benefit-item">
-                        <div class="benefit-icon"><i class="fas fa-map"></i></div>
-                        <div class="benefit-text">Personalized career roadmap</div>
+                        <div class="benefit-icon"><i class="fas fa-brain"></i></div>
+                        <div>
+                            <strong style="display: block; font-size: 1.1rem; margin-bottom: 0.3rem;">Cognitive Intelligence</strong>
+                            <div class="benefit-text">AI thinks like a career counselor to understand you deeply</div>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-eye"></i></div>
+                        <div>
+                            <strong style="display: block; font-size: 1.1rem; margin-bottom: 0.3rem;">Explainable AI (XAI)</strong>
+                            <div class="benefit-text">See WHY each career is recommended with transparent reasoning</div>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-road"></i></div>
+                        <div>
+                            <strong style="display: block; font-size: 1.1rem; margin-bottom: 0.3rem;">Personalized Roadmap</strong>
+                            <div class="benefit-text">Get step-by-step learning path to achieve your career</div>
+                        </div>
                     </div>
                     
                     <div class="benefit-item">
                         <div class="benefit-icon"><i class="fas fa-microscope"></i></div>
-                        <div class="benefit-text">AI-based skill gap analysis</div>
+                        <div>
+                            <strong style="display: block; font-size: 1.1rem; margin-bottom: 0.3rem;">Skill Gap Analysis</strong>
+                            <div class="benefit-text">Identify exact skills you need to bridge the gap</div>
+                        </div>
                     </div>
                     
-                    <div class="benefit-item">
-                        <div class="benefit-icon"><i class="fas fa-lightbulb"></i></div>
-                        <div class="benefit-text">Transparent explanations (XAI)</div>
-                    </div>
-                    
-                    <div class="benefit-item">
-                        <div class="benefit-icon"><i class="fas fa-chart-line"></i></div>
-                        <div class="benefit-text">Future job trend insights</div>
-                    </div>
-                    
-                    <div class="benefit-item">
-                        <div class="benefit-icon"><i class="fas fa-lock"></i></div>
-                        <div class="benefit-text">Secure & private data</div>
+                    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.2); text-align: center;">
+                        <p style="font-size: 0.95rem; opacity: 0.9;"><i class="fas fa-graduation-cap"></i> Academic Project • <i class="fas fa-lock"></i> Privacy Focused • <i class="fas fa-lightbulb"></i> Explainable AI</p>
                     </div>
                 </div>
                 
                 <!-- Right Side - Form -->
                 <div class="auth-form">
-                    <h1 class="form-title">Create Account</h1>
-                    <p class="form-subtitle">Join thousands discovering their perfect career</p>
+                    <h1 class="form-title">Try the System</h1>
+                    <p class="form-subtitle">Create an account to explore CareerAI</p>
                     
                     <form action="/register-submit" method="POST">
                         <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-control" name="name" placeholder="John Doe" required>
+                            <label class="form-label"><i class="fas fa-user"></i> Full Name</label>
+                            <input type="text" class="form-control" name="name" placeholder="John Doe" required style="transition: all 0.3s ease;">
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-control" name="email" placeholder="you@example.com" required>
+                            <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+                            <input type="email" class="form-control" name="email" placeholder="you@example.com" required style="transition: all 0.3s ease;">
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control" name="password" placeholder="Create a strong password" required>
+                            <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" class="form-control" name="password" placeholder="Create a strong password" required style="transition: all 0.3s ease;">
+                            <small style="color: #6c757d; font-size: 0.85rem; margin-top: 0.3rem; display: block;">Minimum 8 characters</small>
                         </div>
                         
                         <button type="submit" class="btn-register">
-                            <i class="fas fa-user-check me-2"></i> Create Account
+                            <i class="fas fa-user-plus me-2"></i> Create Account
                         </button>
                     </form>
                     
@@ -1115,6 +1335,24 @@ def register():
         </div>
         
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Form field focus animation
+            document.querySelectorAll('.form-control').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'scale(1.01)';
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(108, 99, 255, 0.1)';
+                });
+                input.addEventListener('blur', function() {
+                    this.style.transform = '';
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Float animation for left side
+            document.querySelector('.auth-benefits').style.animation = 'float 3s ease-in-out infinite';
+        </script>
     </body>
     </html>
     '''
