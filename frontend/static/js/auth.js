@@ -33,7 +33,7 @@ const AuthModule = {
         this.initializePasswordToggles();
         this.initializeFormValidation();
         
-        console.log('🔐 Authentication module initialized');
+        console.log('Authentication module initialized');
     }
 };
 
@@ -483,25 +483,6 @@ AuthModule.handleRegistration = function(e) {
             this.setSubmissionState(false);
         });
 };
-    
-    // Submit registration
-    this.submitForm(form.action, formData)
-        .then(data => {
-            if (data.success) {
-                this.showAlert('success', 'Account created successfully! Please check your email.');
-                
-                // Redirect to login after delay
-                setTimeout(() => {
-                    window.location.href = data.redirect_url || '/auth/login';
-                }, 2000);
-            } else {
-                this.handleFormErrors(data);
-            }
-        })
-        .finally(() => {
-            this.setSubmissionState(false);
-        });
-};
 
 AuthModule.handleForgotPassword = function(e) {
     e.preventDefault();
@@ -549,29 +530,6 @@ AuthModule.validateForm = function(form) {
     });
     
     return isValid;
-};
-
-AuthModule.submitForm = async function(url, formData) {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        return await response.json();
-        
-    } catch (error) {
-        console.error('Form submission error:', error);
-        this.showAlert('error', 'Network error. Please check your connection and try again.');
-        throw error;
-    }
 };
 
 AuthModule.handleFormErrors = function(data) {

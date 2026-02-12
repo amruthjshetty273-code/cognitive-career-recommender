@@ -3,210 +3,873 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerAI - Cognitive Career & Job Recommendation System</title>
+    <title>CareerAI - Cognitive Career Recommender</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        :root {
+            --primary: #6C63FF;
+            --secondary: #00BFA6;
+            --accent: #FFB703;
+            --dark: #1a1a1a;
+            --light: #f8f9fa;
+            --danger: #FF6B6B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            background: white;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .nav-link {
+            color: var(--dark);
+            font-weight: 500;
+            margin: 0 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-buttons .btn {
+            margin: 0 0.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border: none;
+            color: var(--dark);
+        }
+
+        .btn-primary:hover {
+            background: #FFA500;
+            color: var(--dark);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 20px 60px;
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.08) 0%, rgba(0, 191, 166, 0.05) 100%);
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            color: var(--dark);
+        }
+
+        .hero-text p {
+            font-size: 1.05rem;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .hero-buttons .btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .btn-hero-primary {
+            background: var(--accent);
+            color: var(--dark);
+            border: none;
+            box-shadow: 0 5px 20px rgba(255, 183, 3, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-hero-primary:hover {
+            background: #FFA500;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 183, 3, 0.4);
+            color: var(--dark);
+        }
+
+        .btn-hero-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .btn-hero-outline:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .hero-preview {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 24px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .preview-title {
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--dark);
+        }
+
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
+        .preview-row:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .preview-value {
+            color: var(--dark);
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .preview-note {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(0, 191, 166, 0.08);
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+            color: #555;
+            font-size: 0.92rem;
+        }
+
+        /* Problem Solution Section */
+        .problem-solution {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .ps-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .ps-column h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        .ps-item {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .ps-item:last-child {
+            border-bottom: none;
+        }
+
+        .ps-title {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .ps-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .main-container {
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-            backdrop-filter: blur(20px);
-            max-width: 700px;
-            width: 90%;
-            overflow: hidden;
-            animation: slideInUp 0.8s ease;
-        }
-        
-        .hero-section { 
-            padding: 3rem 2rem 2rem 2rem; 
-            text-align: center; 
-            background: white;
-        }
-        .brain-icon {
-            font-size: 4rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-            animation: pulse 2s infinite;
-        }
-        .title { 
-            font-size: 2.8rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-        .subtitle {
-            font-size: 1.2rem;
-            color: #5a6c7d;
-            font-weight: 500;
-            margin-bottom: 0.8rem;
-        }
-        .tagline {
-            font-size: 1rem;
-            color: #7f8c8d;
-            margin-bottom: 2rem;
-        }
-        
-        .btn-main {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 12px 30px;
-            font-weight: 600;
-            border-radius: 25px;
+            margin-right: 12px;
             color: white;
-            text-decoration: none;
-            margin: 0.5rem;
-            display: inline-block;
-            transition: all 0.3s ease;
+            font-weight: bold;
         }
-        .btn-main:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-            color: white;
+
+        .problem .ps-icon {
+            background: var(--danger);
         }
-        
-        .features-section {
-            background: #f8f9fa;
-            padding: 3rem 2rem;
-            border-top: 1px solid #e9ecef;
+
+        .solution .ps-icon {
+            background: var(--secondary);
         }
+
+        .ps-desc {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Core Features Section */
+        .why-different {
+            padding: 80px 20px;
+            background: var(--light);
+        }
+
         .section-title {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 2.2rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
             text-align: center;
-            margin-bottom: 2.5rem;
-            color: #2c3e50;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 50px;
+            color: var(--dark);
         }
+
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
             max-width: 1000px;
             margin: 0 auto;
         }
-        .feature-item {
-            text-align: center;
-            padding: 2rem 1.5rem;
+
+        .feature-card {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            padding: 30px 24px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            text-align: center;
+            border-top: 5px solid var(--primary);
         }
-        .feature-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+
+        .feature-card:nth-child(2) {
+            border-top-color: var(--secondary);
         }
-        .feature-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--feature-gradient);
+
+        .feature-card:nth-child(3) {
+            border-top-color: var(--accent);
         }
-        .feature-item:nth-child(1) {
-            --feature-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
         }
-        .feature-item:nth-child(2) {
-            --feature-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-        .feature-item:nth-child(3) {
-            --feature-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
+
         .feature-icon {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-            background: var(--feature-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: block;
-            height: 4rem;
-            line-height: 4rem;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: var(--primary);
         }
-        .feature-title {
+
+        .feature-card:nth-child(2) .feature-icon {
+            color: var(--secondary);
+        }
+
+        .feature-card:nth-child(3) .feature-icon {
+            color: var(--accent);
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
             font-weight: 700;
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: #2c3e50;
+            margin-bottom: 10px;
+            color: var(--dark);
         }
-        .feature-desc {
-            font-size: 1rem;
-            color: #6c757d;
-            margin: 0;
+
+        .feature-card p {
+            color: #666;
+            font-size: 0.95rem;
             line-height: 1.6;
         }
-        
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 80px 20px;
+            background: white;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+        .works-container {
+            max-width: 900px;
+            margin: 0 auto;
         }
-        
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            position: relative;
+        }
+
+        .steps-grid::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+            z-index: 0;
+        }
+
+        .single-step {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .single-step:hover .step-circle {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+        }
+
+        .step-label {
+            font-weight: 650;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        /* Example Output Section */
+        .example-output {
+            padding: 80px 20px;
+            background: var(--light);
+        }
+
+        .output-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .output-text h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .output-text p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .sample-result {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--accent);
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .result-explanation {
+            background: linear-gradient(135deg, rgba(0, 191, 166, 0.1) 0%, rgba(255, 183, 3, 0.05) 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        /* CTA Section */
+        .cta-final {
+            padding: 70px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            text-align: center;
+            color: white;
+        }
+
+        .cta-text h2 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 15px;
+        }
+
+        .cta-text p {
+            font-size: 1.05rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            background: var(--accent);
+            color: var(--dark);
+            padding: 14px 36px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 183, 3, 0.4);
+        }
+
+        .cta-button:hover {
+            background: #FFA500;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 183, 3, 0.5);
+            color: var(--dark);
+        }
+
+        /* Footer */
+        footer {
+            background: #0f0f0f;
+            color: white;
+            padding: 60px 20px 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            max-width: 1300px;
+            margin: 0 auto 40px;
+        }
+
+        .footer-section h5 {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-section p {
+            color: #aaa;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-section ul li a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 30px;
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+
+            .ps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps-grid::before {
+                display: none;
+            }
+
+            .output-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media (max-width: 768px) {
-            .main-container { width: 95%; }
-            .title { font-size: 2.2rem; }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <div class="hero-section">
-            <div class="brain-icon">
-                <i class="fas fa-brain"></i>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid ps-4 pe-4">
+            <a class="navbar-brand" href="/">CareerAI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="#problem">Problem</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#how">How It Works</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#example">Example</a></li>
+                </ul>
             </div>
-            <h1 class="title">CareerAI</h1>
-            <h2 class="subtitle">Cognitive Career & Job Recommendation System</h2>
-            <p class="tagline">Intelligent career guidance powered by Cognitive and Explainable AI</p>
-            
-            <div class="buttons-section">
-                <a href="/register" class="btn-main"><i class="fas fa-user-plus me-2"></i>Create Account</a>
-                <a href="/login" class="btn-main"><i class="fas fa-sign-in-alt me-2"></i>Login</a>
+            <div class="nav-buttons">
+                <a href="/login" class="btn btn-outline-primary">Login</a>
+                <a href="/register" class="btn btn-primary">Start Analysis</a>
             </div>
         </div>
-        
-        <div class="features-section">
-            <h3 class="section-title">Three Pillars of Intelligent Career Recommendation</h3>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text fade-in">
+                    <h1>Cognitive AI Career Recommendation System</h1>
+                    <p>Analyze your skills, resume, and interests to get explainable career recommendations and a learning roadmap.</p>
+                    <div class="hero-buttons">
+                        <a href="/register" class="btn btn-hero-primary">Start Analysis</a>
+                        <a href="#example" class="btn btn-hero-outline">View Example</a>
+                    </div>
+                </div>
+                <div class="hero-preview fade-in">
+                    <div class="preview-title">AI Result Preview</div>
+                    <div class="preview-row">
+                        <div class="preview-label">Top Career Match</div>
+                        <div class="preview-value">Data Scientist</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Match Score</div>
+                        <div class="preview-value">82 percent</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Reason</div>
+                        <div class="preview-value">Python and ML background</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Next Skills</div>
+                        <div class="preview-value">Deep Learning, SQL</div>
+                    </div>
+                    <div class="preview-note">Cognitive AI explanation available with each recommendation.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem -> Solution -->
+    <section class="problem-solution" id="problem">
+        <div class="container">
+            <h2 class="section-title">Problem and Solution</h2>
+            <div class="ps-grid">
+                <div class="ps-column problem fade-in">
+                    <h3>Problems</h3>
+                    <div class="ps-item">
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-xmark"></i></span> Students are confused about career choices</div>
+                    </div>
+                    <div class="ps-item">
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-xmark"></i></span> Existing tools give generic recommendations</div>
+                    </div>
+                    <div class="ps-item">
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-xmark"></i></span> AI systems do not explain why</div>
+                    </div>
+                </div>
+
+                <div class="ps-column solution fade-in">
+                    <h3>Solutions</h3>
+                    <div class="ps-item">
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-check"></i></span> Cognitive AI analyzes user profile deeply</div>
+                    </div>
+                    <div class="ps-item">
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-check"></i></span> Personalized career recommendations</div>
+                    </div>
+                    <div class="ps-item">
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-check"></i></span> Explainable AI shows reasoning for each suggestion</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features -->
+    <section class="why-different" id="features">
+        <div class="container">
+            <h2 class="section-title">Core Cognitive AI Features</h2>
             <div class="features-grid">
-                <div class="feature-item">
+                <div class="feature-card fade-in">
                     <div class="feature-icon"><i class="fas fa-brain"></i></div>
-                    <div class="feature-title">Cognitive Intelligence</div>
-                    <p class="feature-desc">Advanced AI processes your skills, experience, and interests the way a career counselor would, recognizing patterns and connections beyond surface-level keywords.</p>
+                    <h3>Cognitive AI Reasoning</h3>
+                    <p>Simulates human-like reasoning using NLP and ML to interpret skills, interests, and resume context.</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-card fade-in">
                     <div class="feature-icon"><i class="fas fa-eye"></i></div>
-                    <div class="feature-title">Explainable AI (XAI)</div>
-                    <p class="feature-desc">Transparency is built-in. Every recommendation comes with detailed explanations of the reasoning, so you understand exactly why CareerAI suggests each career path.</p>
+                    <h3>Explainable AI</h3>
+                    <p>Provides transparent explanations for each recommendation with interpretable reasoning steps.</p>
                 </div>
-                <div class="feature-item">
-                    <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
-                    <div class="feature-title">Smart Matching</div>
-                    <p class="feature-desc">Our AI analyzes current job market data and industry trends to match your qualifications with emerging opportunities and future-proof career paths.</p>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-route"></i></div>
+                    <h3>Skill and Career Roadmap</h3>
+                    <p>Suggests skills and learning paths required to reach the recommended career roles.</p>
                 </div>
             </div>
         </div>
-    </div>
-    
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how">
+        <div class="container works-container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps-grid">
+                <div class="single-step fade-in">
+                    <div class="step-circle">1</div>
+                    <p class="step-label">User Profile Input</p>
+                </div>
+                <div class="single-step fade-in">
+                    <div class="step-circle">2</div>
+                    <p class="step-label">NLP Resume and Skill Analysis</p>
+                </div>
+                <div class="single-step fade-in">
+                    <div class="step-circle">3</div>
+                    <p class="step-label">Cognitive Reasoning and Career Mapping</p>
+                </div>
+                <div class="single-step fade-in">
+                    <div class="step-circle">4</div>
+                    <p class="step-label">Explainable Output and Roadmap</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Example Output -->
+    <section class="example-output" id="example">
+        <div class="container">
+            <div class="output-grid">
+                <div class="output-text fade-in">
+                    <h3>Example AI Output</h3>
+                    <p>CareerAI produces recommendations with reasoning, match score, and a practical learning roadmap.</p>
+                    <p>Each result shows the skills that led to the match and the next skills to learn.</p>
+                    <a href="/register" class="btn btn-hero-primary" style="display: inline-block; margin-top: 10px;">Start Analysis</a>
+                </div>
+                <div class="sample-result fade-in">
+                    <div class="result-item">
+                        <div class="result-label">Top Career Match</div>
+                        <div class="result-value">Software Developer</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Match Score</div>
+                        <div class="result-value">78 percent</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Reason</div>
+                        <div class="result-explanation">
+                            Strong programming skills, interest in problem solving, and good alignment with common role requirements.
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Skill Gap</div>
+                        <div class="result-value">Data Structures, System Design</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Roadmap</div>
+                        <div class="result-value">Learn DSA, build projects, apply for internships</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="cta-final">
+        <div class="cta-text fade-in">
+            <h2>Start Your Cognitive AI Career Analysis</h2>
+            <p>Begin with your resume and get explainable career recommendations.</p>
+            <a href="/register" class="cta-button">Start Analysis</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h5>CareerAI</h5>
+                <p>Cognitive AI-based career recommendation system for students and professionals.</p>
+            </div>
+            <div class="footer-section">
+                <h5>Features</h5>
+                <ul>
+                    <li><a href="#features">Cognitive AI Analysis</a></li>
+                    <li><a href="#features">Explainable AI</a></li>
+                    <li><a href="#features">Career Roadmap</a></li>
+                    <li><a href="#example">Demo</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h5>Project</h5>
+                <ul>
+                    <li><a href="#">About Project</a></li>
+                    <li><a href="#">Team</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h5>Technology</h5>
+                <ul>
+                    <li><a href="#">NLP</a></li>
+                    <li><a href="#">Machine Learning</a></li>
+                    <li><a href="#">Explainable AI (XAI)</a></li>
+                    <li><a href="#">Cognitive Computing</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 CareerAI. Cognitive AI career guidance system.</p>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
 </body>
 </html>

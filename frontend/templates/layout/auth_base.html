@@ -89,16 +89,8 @@
     
     <!-- Custom Auth JS -->
     <script src="/static/js/auth.js"></script>
-    
-    <!-- Initialize Auth Module -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof AuthModule !== 'undefined') {
-                AuthModule.init();
-            }
-        });
-    </script>
-    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+
+    <!-- Auth module initializes itself -->
     {% block extra_js %}{% endblock %}
     
     <!-- Theme Toggle -->

@@ -1,9 +1,22 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect
 import os
+import hashlib
+import secrets
 
 app = Flask(__name__, 
             template_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'templates'),
             static_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static'))
+app.secret_key = secrets.token_hex(32)
+
+users_db = {}
+
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
+def verify_password(password, password_hash):
+    return hash_password(password) == password_hash
 
 
 @app.route('/')
@@ -1545,34 +1558,90 @@ def demo():
 
 @app.route('/auth', methods=['POST'])
 def authenticate():
-    return '''
-    <!DOCTYPE html>
-    <html>
-    <head><title>Authenticating...</title></head>
-    <body>
-        <script>
-            alert("Welcome to CareerAI! Processing your login...");
-            window.location.href = "/dashboard";
-        </script>
-    </body>
-    </html>
-    '''
+    email = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '')
+
+    if not email or not password:
+        return '''
+        <!DOCTYPE html>
+        <html>
+        <head><title>Login Failed</title></head>
+        <body>
+            <p>Login failed. Email and password are required.</p>
+            <p><a href="/login">Return to login</a></p>
+        </body>
+        </html>
+        ''', 400
+
+    user = users_db.get(email)
+    if not user or not verify_password(password, user['password_hash']):
+        return '''
+        <!DOCTYPE html>
+        <html>
+        <head><title>Login Failed</title></head>
+        <body>
+            <p>Login failed. Invalid email or password.</p>
+            <p><a href="/login">Return to login</a></p>
+        </body>
+        </html>
+        ''', 401
+
+    session['user_id'] = email
+    session['user_name'] = user.get('name') or user.get('email')
+    return redirect('/dashboard')
 
 
 @app.route('/register-submit', methods=['POST'])
 def register_submit():
-    return '''
-    <!DOCTYPE html>
-    <html>
-    <head><title>Account Created...</title></head>
-    <body>
-        <script>
-            alert("Account created successfully! Welcome to CareerAI!");
-            window.location.href = "/dashboard";
-        </script>
-    </body>
-    </html>
-    '''
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '')
+
+    if not name or not email or not password:
+        return '''
+        <!DOCTYPE html>
+        <html>
+        <head><title>Registration Failed</title></head>
+        <body>
+            <p>Registration failed. All fields are required.</p>
+            <p><a href="/register">Return to registration</a></p>
+        </body>
+        </html>
+        ''', 400
+
+    if len(password) < 8:
+        return '''
+        <!DOCTYPE html>
+        <html>
+        <head><title>Registration Failed</title></head>
+        <body>
+            <p>Registration failed. Password must be at least 8 characters.</p>
+            <p><a href="/register">Return to registration</a></p>
+        </body>
+        </html>
+        ''', 400
+
+    if email in users_db:
+        return '''
+        <!DOCTYPE html>
+        <html>
+        <head><title>Registration Failed</title></head>
+        <body>
+            <p>Registration failed. Email is already registered.</p>
+            <p><a href="/register">Return to registration</a></p>
+        </body>
+        </html>
+        ''', 400
+
+    users_db[email] = {
+        'name': name,
+        'email': email,
+        'password_hash': hash_password(password)
+    }
+
+    session['user_id'] = email
+    session['user_name'] = name
+    return redirect('/dashboard')
 
 
 # ============ DASHBOARD NAVIGATION SIDEBAR ============
