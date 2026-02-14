@@ -460,3 +460,17 @@ Specialized styles for login, register, and auth pages
     animation: none;
   }
 }
+
+/* ========== PLACEHOLDER TEXT STYLING ========== */
+.form-control::placeholder,
+.form-select::placeholder {
+  color: #999999;
+  opacity: 0.7;
+}
+
+input::placeholder,
+textarea::placeholder,
+select::placeholder {
+  color: #999999;
+  opacity: 0.7;
+}

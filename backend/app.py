@@ -12,6 +12,7 @@ from datetime import datetime
 from ai_engine.cognitive_engine import CognitiveRecommendationEngine
 from services.career_matcher import match_roles
 from nlp_processor.resume_analyzer import ResumeAnalyzer
+from nlp_processor.resume_analyzer_simple import ResumeAnalyzer as SimpleResumeAnalyzer
 from utils.data_processor import DataProcessor
 from config import Config
 
@@ -74,11 +75,18 @@ except Exception as e:
     print(f"Warning: Could not initialize CognitiveRecommendationEngine: {e}")
     cognitive_engine = None
 
+# Initialize resume analyzer with fallback to simple version
 try:
     resume_analyzer = ResumeAnalyzer()
+    print("✓ ResumeAnalyzer initialized successfully")
 except Exception as e:
-    print(f"Warning: Could not initialize ResumeAnalyzer: {e}")
-    resume_analyzer = None
+    print(f"Warning: Could not initialize ResumeAnalyzer ({e}), using SimpleResumeAnalyzer instead")
+    try:
+        resume_analyzer = SimpleResumeAnalyzer()
+        print("✓ SimpleResumeAnalyzer initialized successfully")
+    except Exception as e2:
+        print(f"Warning: Could not initialize SimpleResumeAnalyzer: {e2}")
+        resume_analyzer = None
 
 try:
     data_processor = DataProcessor()
@@ -301,13 +309,19 @@ def upload_resume():
         if file.filename == '':
             return jsonify({'error': 'No file selected'})
         
-        # Process resume using NLP
-        resume_data = resume_analyzer.extract_information(file)
-        structured_profile = _build_structured_profile(resume_data)
-        return jsonify({
-            'resume_data': resume_data,
-            'structured_profile': structured_profile
-        })
+        # Process resume using NLP if available
+        if not resume_analyzer:
+            return jsonify({'error': 'Resume analyzer is not available. Please use manual input.'}), 503
+        
+        try:
+            resume_data = resume_analyzer.extract_information(file)
+            structured_profile = _build_structured_profile(resume_data)
+            return jsonify({
+                'resume_data': resume_data,
+                'structured_profile': structured_profile
+            })
+        except Exception as e:
+            return jsonify({'error': f'Failed to parse resume: {str(e)}'}), 400
     
     return render_template('upload_resume.html')
 
@@ -365,22 +379,26 @@ def get_feedback_history():
 @app.route('/api/skills', methods=['GET'])
 def get_skills_data():
     """API endpoint for skills analysis"""
+    if not data_processor:
+        return jsonify({'error': 'Skills service temporarily unavailable'}), 503
     skills_data = data_processor.get_skills_taxonomy()
-    return jsonify(skills_data)
+    return jsonify(skills_data if skills_data else {})
 
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs_data():
     """API endpoint for job market data"""
+    if not data_processor:
+        return jsonify({'error': 'Jobs service temporarily unavailable'}), 503
     jobs_data = data_processor.get_job_market_data()
-    return jsonify(jobs_data)
+    return jsonify(jobs_data if jobs_data else {})
 
 @app.errorhandler(404)
 def not_found_error(error):
-    return render_template('404.html'), 404
+    return render_template('errors/404.html'), 404
 
 @app.errorhandler(500)
 def internal_error(error):
-    return render_template('500.html'), 500
+    return render_template('errors/500.html'), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
