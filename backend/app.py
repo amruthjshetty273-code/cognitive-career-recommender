@@ -80,18 +80,24 @@ except Exception as e:
     print(f"Warning: Could not initialize CognitiveRecommendationEngine: {e}")
     cognitive_engine = None
 
-# Initialize resume analyzer with fallback to simple version
+# Initialize resume analyzers with fallback
+resume_analyzer = None
+simple_analyzer = None
+
 try:
     resume_analyzer = ResumeAnalyzer()
     print("✓ ResumeAnalyzer initialized successfully")
 except Exception as e:
-    print(f"Warning: Could not initialize ResumeAnalyzer ({e}), using SimpleResumeAnalyzer instead")
-    try:
-        resume_analyzer = SimpleResumeAnalyzer()
-        print("✓ SimpleResumeAnalyzer initialized successfully")
-    except Exception as e2:
-        print(f"Warning: Could not initialize SimpleResumeAnalyzer: {e2}")
-        resume_analyzer = None
+    print(f"Warning: Could not initialize ResumeAnalyzer ({e})")
+
+# Always initialize simple analyzer as fallback
+try:
+    simple_analyzer = SimpleResumeAnalyzer()
+    print("✓ SimpleResumeAnalyzer initialized successfully")
+    if not resume_analyzer:
+        resume_analyzer = simple_analyzer  # Use simple as primary if main failed
+except Exception as e:
+    print(f"Warning: Could not initialize SimpleResumeAnalyzer: {e}")
 
 try:
     data_processor = DataProcessor()
@@ -314,19 +320,38 @@ def upload_resume():
         if file.filename == '':
             return jsonify({'error': 'No file selected'})
         
-        # Process resume using NLP if available
-        if not resume_analyzer:
-            return jsonify({'error': 'Resume analyzer is not available. Please use manual input.'}), 503
+        # Reset file pointer for potential retries
+        file.stream.seek(0)
         
-        try:
-            resume_data = resume_analyzer.extract_information(file)
-            structured_profile = _build_structured_profile(resume_data)
-            return jsonify({
-                'resume_data': resume_data,
-                'structured_profile': structured_profile
-            })
-        except Exception as e:
-            return jsonify({'error': f'Failed to parse resume: {str(e)}'}), 400
+        # Try primary analyzer first
+        resume_data = None
+        if resume_analyzer:
+            try:
+                resume_data = resume_analyzer.extract_information(file)
+                if resume_data and not resume_data.get('error'):
+                    structured_profile = _build_structured_profile(resume_data)
+                    return jsonify({
+                        'resume_data': resume_data,
+                        'structured_profile': structured_profile
+                    })
+            except Exception as e:
+                print(f"Warning: ResumeAnalyzer failed: {e}, trying fallback...")
+                file.stream.seek(0)
+        
+        # Fallback to simple analyzer if available
+        if globals().get('simple_analyzer'):
+            try:
+                simple_analyzer = SimpleResumeAnalyzer()
+                resume_data = simple_analyzer.extract_information(file)
+                structured_profile = _build_structured_profile(resume_data)
+                return jsonify({
+                    'resume_data': resume_data,
+                    'structured_profile': structured_profile
+                })
+            except Exception as e:
+                print(f"Warning: SimpleResumeAnalyzer also failed: {e}")
+        
+        return jsonify({'error': 'Failed to parse resume. Please try manual profile entry.'}), 400
     
     return render_template('upload_resume.html')
 
