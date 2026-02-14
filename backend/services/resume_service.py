@@ -5,26 +5,45 @@ Handles resume file upload, parsing, and text extraction
 
 import os
 import json
-import spacy
-import nltk
-from nltk.tokenize import sent_tokenize, word_tokenize
 import PyPDF2
 import docx
 from models import db, Resume, UserSkill
 from services.skill_extractor import SkillExtractor
 
-# Download required NLTK data
+# Optional NLP imports
 try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
+    import spacy
+    SPACY_AVAILABLE = True
+except ImportError:
+    SPACY_AVAILABLE = False
+
+try:
+    import nltk
+    from nltk.tokenize import sent_tokenize, word_tokenize
+    NLTK_AVAILABLE = True
+    # Download required NLTK data
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        try:
+            nltk.download('punkt')
+        except:
+            NLTK_AVAILABLE = False
+except ImportError:
+    NLTK_AVAILABLE = False
 
 class ResumeService:
     UPLOAD_FOLDER = 'uploads/resumes'
     ALLOWED_EXTENSIONS = {'pdf', 'docx'}
     
     def __init__(self):
-        self.nlp = spacy.load('en_core_web_sm')
+        if SPACY_AVAILABLE:
+            try:
+                self.nlp = spacy.load('en_core_web_sm')
+            except:
+                self.nlp = None
+        else:
+            self.nlp = None
         self.skill_extractor = SkillExtractor()
         os.makedirs(self.UPLOAD_FOLDER, exist_ok=True)
     

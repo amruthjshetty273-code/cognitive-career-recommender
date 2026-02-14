@@ -31,12 +31,15 @@ except ImportError:
 
 try:
     import nltk
+    from nltk.corpus import stopwords
+    from nltk.tokenize import word_tokenize, sent_tokenize
     NLTK_AVAILABLE = True
 except ImportError:
     NLTK_AVAILABLE = False
+    stopwords = None
+    word_tokenize = None
+    sent_tokenize = None
 
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize, sent_tokenize
 from typing import Dict, List, Any, Tuple, Optional
 import json
 
@@ -48,21 +51,33 @@ class ResumeAnalyzer:
     
     def __init__(self):
         # Load spaCy model
-        try:
-            self.nlp = spacy.load("en_core_web_sm")
-        except OSError:
-            print("spaCy model not found. Please install with: python -m spacy download en_core_web_sm")
+        if SPACY_AVAILABLE:
+            try:
+                self.nlp = spacy.load("en_core_web_sm")
+            except OSError:
+                print("spaCy model not found. Please install with: python -m spacy download en_core_web_sm")
+                self.nlp = None
+        else:
             self.nlp = None
         
         # Download NLTK data if needed
-        try:
-            nltk.data.find('tokenizers/punkt')
-            nltk.data.find('corpora/stopwords')
-        except LookupError:
-            nltk.download('punkt')
-            nltk.download('stopwords')
-        
-        self.stop_words = set(stopwords.words('english'))
+        if NLTK_AVAILABLE:
+            try:
+                nltk.data.find('tokenizers/punkt')
+                nltk.data.find('corpora/stopwords')
+            except LookupError:
+                try:
+                    nltk.download('punkt')
+                    nltk.download('stopwords')
+                except:
+                    pass
+            
+            try:
+                self.stop_words = set(stopwords.words('english'))
+            except:
+                self.stop_words = set()
+        else:
+            self.stop_words = set()
         
         # Load skill taxonomies and patterns
         self._load_skill_patterns()
