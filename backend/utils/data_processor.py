@@ -53,10 +53,12 @@ class DataProcessor:
                 'Google', 'Microsoft', 'Amazon', 'Apple', 'Facebook',
                 'Netflix', 'Uber', 'Airbnb', 'Tesla', 'SpaceX'
             ] * 10,
-            'location': [
-                'San Francisco, CA', 'Seattle, WA', 'New York, NY', 'Austin, TX',
-                'Boston, MA', 'Chicago, IL', 'Los Angeles, CA', 'Denver, CO'
-            ] * 13,  # Repeating to fill 100 entries
+            'location': (
+                [
+                    'San Francisco, CA', 'Seattle, WA', 'New York, NY', 'Austin, TX',
+                    'Boston, MA', 'Chicago, IL', 'Los Angeles, CA', 'Denver, CO'
+                ] * 13
+            )[:100],
             'required_skills': [
                 'Python, Machine Learning, SQL, Statistics',
                 'Java, Python, SQL, Git, Agile',
@@ -75,10 +77,12 @@ class DataProcessor:
             'employment_type': [
                 'Full-time', 'Part-time', 'Contract', 'Remote'
             ] * 25,
-            'industry': [
-                'Technology', 'Healthcare', 'Finance', 'Education',
-                'Retail', 'Manufacturing', 'Entertainment', 'Consulting'
-            ] * 13,
+            'industry': (
+                [
+                    'Technology', 'Healthcare', 'Finance', 'Education',
+                    'Retail', 'Manufacturing', 'Entertainment', 'Consulting'
+                ] * 13
+            )[:100],
             'salary_min': np.random.randint(50000, 120000, 100),
             'salary_max': np.random.randint(80000, 200000, 100),
             'posted_date': pd.date_range(start='2024-01-01', periods=100, freq='D'),
@@ -218,8 +222,10 @@ class DataProcessor:
         }
         
         # Duplicate for different experience levels
+        base_count = len(salary_data['job_title'])
         for level in ['Mid Level', 'Senior Level']:
-            for i, title in enumerate(salary_data['job_title']):
+            for i in range(base_count):
+                title = salary_data['job_title'][i]
                 multiplier = 1.3 if level == 'Mid Level' else 1.6
                 salary_data['job_title'].append(title)
                 salary_data['experience_level'].append(level)

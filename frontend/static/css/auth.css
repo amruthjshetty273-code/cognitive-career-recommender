@@ -372,10 +372,19 @@ Specialized styles for login, register, and auth pages
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 576px) {
+  .auth-navbar .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   .auth-container {
     padding: 1rem 0.5rem;
   }
   
+  .auth-card {
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  }
+
   .auth-card-header,
   .auth-card-body,
   .auth-card-footer {
@@ -389,6 +398,18 @@ Specialized styles for login, register, and auth pages
   
   .auth-subtitle {
     font-size: 0.875rem;
+  }
+
+  .auth-card .btn {
+    width: 100%;
+  }
+
+  .auth-card .btn + .btn {
+    margin-top: 0.75rem;
+  }
+
+  .auth-links {
+    font-size: 0.9rem;
   }
 }
 

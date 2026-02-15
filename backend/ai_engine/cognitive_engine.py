@@ -51,14 +51,23 @@ class CognitiveRecommendationEngine:
     
     def _initialize_models(self):
         """Initialize machine learning models and explainable AI components"""
-        try:
-            # Load pre-trained models if available
-            self.job_model = joblib.load('models/job_recommendation_model.pkl')
-            self.skill_vectorizer = joblib.load('models/skill_vectorizer.pkl')
-        except (FileNotFoundError, EOFError, Exception):
+        if JOBLIB_AVAILABLE:
+            try:
+                # Load pre-trained models if available
+                self.job_model = joblib.load('models/job_recommendation_model.pkl')
+                self.skill_vectorizer = joblib.load('models/skill_vectorizer.pkl')
+            except (FileNotFoundError, EOFError, Exception):
+                self.job_model = None
+                self.skill_vectorizer = None
+
+        if self.job_model is None or self.skill_vectorizer is None:
             # Initialize new models if not found or corrupted
-            self.job_model = RandomForestClassifier(n_estimators=10, random_state=42)
-            self.skill_vectorizer = TfidfVectorizer(max_features=100, stop_words='english')
+            if SKLEARN_AVAILABLE:
+                self.job_model = RandomForestClassifier(n_estimators=10, random_state=42)
+                self.skill_vectorizer = TfidfVectorizer(max_features=100, stop_words='english')
+            else:
+                self.job_model = None
+                self.skill_vectorizer = None
         
         # Initialize explainable AI components with error handling
         try:
