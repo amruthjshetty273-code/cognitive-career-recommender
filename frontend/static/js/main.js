@@ -21,7 +21,8 @@ const CognitiveCareerAI = {
     state: {
         isLoading: false,
         currentUser: null,
-        theme: 'light'
+        theme: 'light',
+        initialized: false
     },
     
     // Utility functions
@@ -32,6 +33,8 @@ const CognitiveCareerAI = {
     
     // Initialize the app
     init: function() {
+        if (this.state.initialized) return;
+        this.state.initialized = true;
         this.initializeTheme();
         this.setupGlobalEventListeners();
         this.initializeTooltips();

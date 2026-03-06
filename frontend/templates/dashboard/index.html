@@ -39,6 +39,9 @@
                     <div class="brand-title">CareerAI</div>
                     <div class="brand-subtitle">Skill-Based Matching</div>
                 </div>
+                <button type="button" id="theme-toggle" class="btn btn-sm dashboard-theme-toggle ms-auto" title="Toggle Theme" aria-label="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
 
             <div class="sidebar-user">
@@ -46,16 +49,18 @@
                     <i class="fas fa-user-circle"></i>
                 </div>
                 <div>
-                    <div class="user-name">{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}User{% endif %}</div>
+                    <div class="user-name">{% if user.name %}{{ user.name }}{% else %}User{% endif %}</div>
                     <div class="user-email">{{ user.email }}</div>
                 </div>
             </div>
 
             <nav class="sidebar-nav">
+                <div class="nav-group-title">Main</div>
                 <a class="nav-item active" href="#overview" id="dashboardNav">
                     <i class="fas fa-th-large"></i>
                     Dashboard
                 </a>
+                <div class="nav-group-title">Profile</div>
                 <a class="nav-item" href="#input-modes" id="uploadResumeNav">
                     <i class="fas fa-file-upload"></i>
                     Upload Resume
@@ -64,6 +69,7 @@
                     <i class="fas fa-edit"></i>
                     Manual Profile
                 </a>
+                <div class="nav-group-title">Career</div>
                 <a class="nav-item" href="#career-matches" id="careersNav">
                     <i class="fas fa-briefcase"></i>
                     Career Matches
@@ -76,6 +82,7 @@
                     <i class="fas fa-map-marked-alt"></i>
                     Learning Roadmap
                 </a>
+                <div class="nav-group-title">Other</div>
                 <a class="nav-item" href="#feedback" id="feedbackNav">
                     <i class="fas fa-comments"></i>
                     Feedback History
@@ -98,16 +105,16 @@
             <section class="hero-panel" id="overview">
                 <div class="hero-content">
                     <p class="hero-eyebrow">Career Matching Dashboard</p>
-                    <h1>Welcome back, {% if user.first_name %}{{ user.first_name }}{% else %}User{% endif %}.</h1>
+                    <h1>Welcome back, {% if user.name %}{{ user.name.split(' ')[0] }}{% else %}User{% endif %}.</h1>
                     <p class="hero-subtitle">
                         Upload a resume or enter details manually. Both routes create the same structured profile for
                         skill matching, explainable reasoning, and a learning roadmap.
                     </p>
                     <div class="hero-actions">
-                        <button class="btn btn-primary hero-btn" id="getStartedBtn">
-                            <i class="fas fa-bolt me-2"></i>Generate Matches
+                        <button class="btn btn-primary hero-btn hero-btn-primary" id="getStartedBtn">
+                            <i class="fas fa-bolt me-2"></i>Generate Career Matches
                         </button>
-                        <a class="btn btn-outline-light hero-btn" href="#input-modes">
+                        <a class="btn btn-outline-light hero-btn hero-btn-secondary" href="#input-modes">
                             <i class="fas fa-arrow-down me-2"></i>Choose Input Mode
                         </a>
                     </div>
@@ -145,8 +152,9 @@
                     <div class="file-drop-zone" id="fileDropZone">
                         <div class="drop-zone-content">
                             <i class="fas fa-cloud-upload-alt drop-icon"></i>
-                            <h6>Drop resume here</h6>
+                            <h6>Drag and drop resume</h6>
                             <p>or click to browse</p>
+                            <small class="drop-meta">Supported: PDF, DOCX, TXT</small>
                             <input type="file" id="resumeUpload" class="d-none" accept=".pdf,.doc,.docx,.txt">
                         </div>
                         <div class="upload-progress d-none">
@@ -281,8 +289,9 @@
 
                 <div class="empty-state" id="recommendationsEmpty">
                     <i class="fas fa-compass"></i>
-                    <h6>No recommendations yet</h6>
-                    <p>Upload a resume or complete the manual profile to start.</p>
+                    <h6>No Career Matches Yet</h6>
+                    <p>Upload a resume or complete your profile to generate AI career recommendations.</p>
+                    <a href="#input-modes" class="btn btn-primary btn-sm empty-state-action">Go to Input Modes</a>
                 </div>
                 <div id="recommendationsList" class="recommendations-grid d-none"></div>
             </section>
@@ -296,8 +305,9 @@
                 </div>
                 <div class="empty-state" id="liveJobsEmpty">
                     <i class="fas fa-bolt"></i>
-                    <h6>No live results yet</h6>
-                    <p>Upload a resume or submit a manual profile to fetch live jobs.</p>
+                    <h6>Live Jobs Not Loaded</h6>
+                    <p>Complete your profile to see market jobs matching your skills.</p>
+                    <button class="btn btn-outline-primary btn-sm empty-state-action" id="liveJobsCtaBtn">Generate Matches</button>
                 </div>
                 <div id="liveJobsList" class="recommendations-grid d-none"></div>
             </section>
@@ -310,7 +320,11 @@
                     </div>
                 </div>
                 <div class="panel-card">
-                    <div id="skillGapList" class="tag-list empty-list">No gaps calculated yet.</div>
+                    <div id="skillGapList" class="empty-state compact">
+                        <i class="fas fa-chart-bar"></i>
+                        <h6>No Skill Gaps Yet</h6>
+                        <p>Generate recommendations to view role-wise missing skills.</p>
+                    </div>
                 </div>
             </section>
 
@@ -336,17 +350,16 @@
                     </div>
                 </div>
                 <div class="panel-card">
-                    <div id="feedbackList" class="empty-list">No feedback captured yet.</div>
+                    <div id="feedbackList" class="empty-state compact">
+                        <i class="fas fa-comments"></i>
+                        <h6>No Feedback History Yet</h6>
+                        <p>Rate recommendations and your feedback history will appear here.</p>
+                    </div>
                 </div>
             </section>
             
             <footer style="margin-top: 60px; padding: 20px 0; border-top: 1px solid #e0e0e0; text-align: center; color: #666; font-size: 12px;">
                 <div style="max-width: 1200px; margin: 0 auto;">
-                    <p>
-                        <i class="fas fa-database me-1"></i>
-                        Job market data sourced from <strong>Adzuna Job Market API</strong>
-                        <span id="dataLastUpdated" style="color: #999; margin-left: 10px;">• Updated in real-time</span>
-                    </p>
                     <p style="margin-top: 8px; color: #999;">
                         Skill recommendations calculated from live job postings. No fabricated or synthetic data.
                     </p>

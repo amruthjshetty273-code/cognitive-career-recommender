@@ -6,6 +6,7 @@
     <meta name="description" content="Secure login to your CareerAI account">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}Authentication - CareerAI{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -32,8 +33,8 @@
                     <span class="fw-semibold">CareerAI</span>
                 </a>
                 <div>
-                    <button type="button" id="theme-toggle" class="btn btn-light btn-sm" title="Toggle Theme" aria-label="Toggle Theme" style="width: 38px; height: 38px; padding: 0; display: inline-flex !important; align-items: center; justify-content: center; border: 1px solid #dee2e6;">
-                        <i class="fas fa-moon" style="color: #333 !important; font-size: 18px; line-height: 1; display: inline-block;"></i>
+                    <button type="button" id="theme-toggle" class="btn btn-sm theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme">
+                        <i class="fas fa-moon"></i>
                     </button>
                 </div>
             </div>

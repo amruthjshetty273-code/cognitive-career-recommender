@@ -1,64 +1,686 @@
-<div class="dashboard-shell">
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-brand">
-            <div class="brand-mark"><i class="fas fa-brain"></i></div>
-            <div>
-                <div class="brand-title">CareerAI</div>
-                <div class="brand-subtitle">Cognitive Engine v3</div>
-            </div>
-        </div>
-        
-        <nav class="sidebar-nav">
-            <a href="#" class="nav-item active"><i class="fas fa-th-large"></i> Overview</a>
-            <a href="#" class="nav-item"><i class="fas fa-file-alt"></i> My Resume</a>
-            <a href="#" class="nav-item"><i class="fas fa-briefcase"></i> Job Matches</a>
-        </nav>
+:root {
+    --dash-bg: #eef2f7;
+    --dash-surface: #ffffff;
+    --dash-text: #10223f;
+    --dash-muted: #5f6f86;
+    --dash-border: #dbe4ef;
+    --dash-primary: #124a88;
+    --dash-primary-2: #1b74b8;
+    --dash-accent: #11a89f;
+    --dash-good: #059669;
+    --dash-warn: #f59e0b;
+    --dash-danger: #dc2626;
+    --dash-shadow: 0 16px 40px rgba(16, 34, 63, 0.12);
+}
 
-        <div class="sidebar-footer">
-            <div class="status-chip">
-                <div class="status-dot"></div> AI Engine Online
-            </div>
-        </div>
-    </aside>
+.dashboard-theme-toggle {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(220, 241, 255, 0.4);
+    background: rgba(255, 255, 255, 0.16);
+    color: #eaf4ff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
 
-    <main class="dashboard-main">
-        <section class="hero-panel animate-fadeInUp">
-            <div>
-                <div class="hero-eyebrow">Analysis Complete</div>
-                <h1>Ready for your next leap?</h1>
-                <p class="hero-subtitle">We found 12 roles that match your Python and AWS expertise perfectly.</p>
-                <div class="hero-actions">
-                    <button class="btn btn-light hero-btn">Improve Score</button>
-                    <button class="btn btn-outline-light hero-btn">View Roadmap</button>
-                </div>
-            </div>
-            <div class="hero-meta">
-                <div class="meta-card">
-                    <h5>Market Value</h5>
-                    <div class="meta-value">$120k - $145k</div>
-                    <div class="meta-note">Based on your current skill set</div>
-                </div>
-            </div>
-        </section>
+.dashboard-theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.62);
+    color: #ffffff;
+}
 
-        <div class="section-header">
-            <h2>Top Recommendations</h2>
-            <p>Ranked by Cognitive Match Score</p>
-        </div>
-        
-        <div class="recommendations-grid">
-            <div class="recommendation-card hover-lift">
-                <div class="match-score">
-                    Match <span class="score-pill">94%</span>
-                </div>
-                <h4>Senior Data Architect</h4>
-                <div class="tag-list">
-                    <span class="tag-item matching">Python</span>
-                    <span class="tag-item matching">SQL</span>
-                    <span class="tag-item missing">Terraform</span>
-                </div>
-                <p class="explanation-text">Your background in ETL pipelines makes you a top candidate for this role.</p>
-            </div>
-        </div>
-    </main>
-</div>
+.dashboard-body {
+    background:
+        radial-gradient(circle at 0% 0%, rgba(17, 168, 159, 0.12), transparent 40%),
+        radial-gradient(circle at 100% 10%, rgba(18, 74, 136, 0.1), transparent 35%),
+        var(--dash-bg);
+    color: var(--dash-text);
+}
+
+.dashboard-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+}
+
+.dashboard-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 26px 18px;
+    background: linear-gradient(170deg, #0d2b54, #0f3c73 48%, #0c4f76);
+    color: #eef6ff;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #15bdb4, #2fc0e8);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #022139;
+    box-shadow: 0 10px 20px rgba(9, 206, 193, 0.3);
+}
+
+.brand-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.brand-subtitle {
+    font-size: 0.8rem;
+    color: rgba(232, 243, 255, 0.82);
+}
+
+.sidebar-user {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar {
+    font-size: 1.35rem;
+    color: #cce8ff;
+}
+
+.user-name {
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.user-email {
+    color: rgba(232, 243, 255, 0.76);
+    font-size: 0.8rem;
+    word-break: break-word;
+}
+
+.sidebar-nav {
+    display: grid;
+    gap: 8px;
+}
+
+.nav-group-title {
+    margin-top: 10px;
+    margin-bottom: 2px;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(221, 239, 255, 0.64);
+    font-weight: 700;
+    padding-left: 4px;
+}
+
+.nav-item {
+    border-radius: 10px;
+    padding: 9px 10px;
+    color: rgba(237, 246, 255, 0.88);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.92rem;
+    transition: transform 0.16s ease, background-color 0.16s ease;
+}
+
+.nav-item:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
+    transform: translateX(2px);
+}
+
+.nav-item.active {
+    background: linear-gradient(135deg, rgba(21, 189, 180, 0.28), rgba(47, 192, 232, 0.22));
+    border: 1px solid rgba(136, 244, 243, 0.4);
+    color: #ffffff;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+}
+
+.status-chip {
+    border-radius: 999px;
+    border: 1px solid rgba(124, 255, 231, 0.45);
+    color: #defff7;
+    background: rgba(2, 44, 59, 0.5);
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #5ff4c1;
+    box-shadow: 0 0 0 6px rgba(95, 244, 193, 0.18);
+}
+
+.dashboard-main {
+    padding: 28px;
+    overflow-x: hidden;
+}
+
+.hero-panel {
+    background: linear-gradient(135deg, #123b71, #15558f 52%, #0f7188);
+    color: #f2f8ff;
+    border-radius: 20px;
+    padding: 26px;
+    box-shadow: var(--dash-shadow);
+    display: grid;
+    grid-template-columns: 1fr minmax(280px, 360px);
+    gap: 18px;
+}
+
+.hero-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+.hero-panel h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    margin: 0;
+    line-height: 1.12;
+}
+
+.hero-subtitle {
+    margin: 10px 0 14px;
+    color: rgba(240, 248, 255, 0.92);
+    max-width: 62ch;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.hero-btn {
+    border-radius: 999px;
+}
+
+.hero-btn-primary {
+    font-weight: 700;
+    padding: 10px 20px;
+    box-shadow: 0 10px 20px rgba(13, 85, 143, 0.3);
+}
+
+.hero-btn-secondary {
+    border-width: 1.5px;
+    padding: 10px 18px;
+}
+
+.hero-meta {
+    display: grid;
+    gap: 10px;
+}
+
+.meta-card {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.meta-card h5 {
+    font-size: 0.87rem;
+    margin-bottom: 6px;
+    color: rgba(236, 247, 255, 0.9);
+}
+
+.meta-value {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.meta-note {
+    color: rgba(237, 246, 255, 0.82);
+    font-size: 0.83rem;
+}
+
+.input-grid,
+.insight-grid {
+    margin-top: 22px;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.panel-card {
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.panel-header h3 {
+    font-size: 1.1rem;
+    margin: 0 0 4px;
+}
+
+.panel-header p {
+    margin: 0;
+    color: var(--dash-muted);
+    font-size: 0.9rem;
+}
+
+.panel-tag {
+    background: #e7f5ff;
+    color: #0d4f88;
+    border: 1px solid #b7dfff;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.file-drop-zone {
+    border: 2px dashed #b9d8ee;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #f8fbff, #eef7ff);
+    padding: 26px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.drop-meta {
+    color: #5a738f;
+    font-size: 0.78rem;
+}
+
+.file-drop-zone:hover,
+.file-drop-zone.dragover {
+    border-color: var(--dash-primary-2);
+    transform: translateY(-1px);
+}
+
+.drop-icon {
+    font-size: 1.8rem;
+    color: var(--dash-primary);
+    margin-bottom: 8px;
+}
+
+.support-note {
+    margin: 12px 0 0;
+    font-size: 0.84rem;
+    color: var(--dash-muted);
+}
+
+.manual-form .form-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #334862;
+}
+
+.section-header {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.45rem;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.section-header p {
+    margin: 4px 0 0;
+    color: var(--dash-muted);
+}
+
+.empty-state {
+    border: 1px dashed #c9d9e8;
+    border-radius: 14px;
+    text-align: center;
+    padding: 26px 16px;
+    background: #fbfdff;
+    color: var(--dash-muted);
+    min-height: 165px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+}
+
+.empty-state i {
+    font-size: 1.5rem;
+    color: #7ea6cc;
+    margin-bottom: 6px;
+}
+
+.empty-state h6 {
+    margin-bottom: 2px;
+    color: #25486f;
+    font-size: 1.05rem;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #5b718a;
+}
+
+.empty-state.compact {
+    min-height: 130px;
+}
+
+.empty-state-action {
+    margin-top: 8px;
+    align-self: center;
+}
+
+.recommendations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+#profileCompletionText {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.recommendation-card {
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.recommendation-card h4 {
+    margin: 8px 0 6px;
+    font-size: 1.07rem;
+}
+
+.match-score {
+    color: var(--dash-muted);
+    font-size: 0.88rem;
+}
+
+.score-pill {
+    margin-left: 6px;
+    background: #d8f6ea;
+    border: 1px solid #9fe5c9;
+    color: #036144;
+    border-radius: 999px;
+    font-size: 0.77rem;
+    font-weight: 700;
+    padding: 3px 8px;
+}
+
+.explanation-text {
+    color: #455972;
+    font-size: 0.9rem;
+    display: grid;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.tag-item {
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 0.76rem;
+    border: 1px solid transparent;
+}
+
+.tag-item.matching {
+    background: #e8f5ff;
+    border-color: #b8ddff;
+    color: #0f4b80;
+}
+
+.tag-item.missing {
+    background: #fff0f1;
+    border-color: #ffd0d4;
+    color: #9c2031;
+}
+
+.tag-item.market-skill {
+    background: #ecfdf6;
+    border-color: #b0f0d5;
+    color: #0b6b4c;
+}
+
+.recommendation-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.roadmap-list {
+    margin: 0;
+    padding-left: 20px;
+    color: #334862;
+    display: grid;
+    gap: 8px;
+}
+
+.empty-list {
+    color: var(--dash-muted);
+    font-size: 0.9rem;
+}
+
+.market-skills-container {
+    border: 1px solid #bff1dc;
+    border-radius: 10px;
+    background: #f3fffa;
+    padding: 10px;
+}
+
+html[data-bs-theme='dark'] .dashboard-body {
+    background:
+        radial-gradient(circle at 0% 0%, rgba(17, 168, 159, 0.12), transparent 42%),
+        radial-gradient(circle at 100% 8%, rgba(27, 116, 184, 0.2), transparent 40%),
+        #070f1d;
+    color: #dbe7f5;
+}
+
+html[data-bs-theme='dark'] .dashboard-sidebar {
+    background: linear-gradient(170deg, #06172f, #0b2546 48%, #08314d);
+    border-right-color: rgba(124, 163, 210, 0.22);
+}
+
+html[data-bs-theme='dark'] .sidebar-user {
+    background: rgba(10, 26, 46, 0.8);
+    border-color: rgba(126, 167, 214, 0.22);
+}
+
+html[data-bs-theme='dark'] .nav-item {
+    color: rgba(221, 236, 252, 0.9);
+}
+
+html[data-bs-theme='dark'] .nav-item:hover {
+    background: rgba(120, 174, 230, 0.18);
+}
+
+html[data-bs-theme='dark'] .dashboard-main {
+    color: #d7e5f6;
+}
+
+html[data-bs-theme='dark'] .hero-panel {
+    background: linear-gradient(135deg, #0c2b52, #114072 52%, #0e5a6d);
+}
+
+html[data-bs-theme='dark'] .panel-card,
+html[data-bs-theme='dark'] .recommendation-card {
+    background: #0f1b2f;
+    border-color: #23354f;
+    box-shadow: 0 10px 26px rgba(1, 6, 17, 0.35);
+}
+
+html[data-bs-theme='dark'] .panel-header p,
+html[data-bs-theme='dark'] .section-header p,
+html[data-bs-theme='dark'] .match-score,
+html[data-bs-theme='dark'] .explanation-text,
+html[data-bs-theme='dark'] .support-note,
+html[data-bs-theme='dark'] .empty-list {
+    color: #9fb3ca;
+}
+
+html[data-bs-theme='dark'] .panel-header h3,
+html[data-bs-theme='dark'] .section-header h2,
+html[data-bs-theme='dark'] .recommendation-card h4,
+html[data-bs-theme='dark'] .empty-state h6 {
+    color: #e4efff;
+}
+
+html[data-bs-theme='dark'] .file-drop-zone {
+    border-color: #365273;
+    background: linear-gradient(180deg, #13233a, #0f1d31);
+}
+
+html[data-bs-theme='dark'] .drop-meta {
+    color: #8da5bf;
+}
+
+html[data-bs-theme='dark'] .empty-state {
+    background: #0c1829;
+    border-color: #2b3e59;
+    color: #a4b8cf;
+}
+
+html[data-bs-theme='dark'] .empty-state i {
+    color: #79aede;
+}
+
+html[data-bs-theme='dark'] .empty-state p {
+    color: #9fb5cc;
+}
+
+html[data-bs-theme='dark'] .tag-item.matching {
+    background: #112a45;
+    border-color: #2b5f8c;
+    color: #bcdffd;
+}
+
+html[data-bs-theme='dark'] .tag-item.missing {
+    background: #351a22;
+    border-color: #703141;
+    color: #ffc2ca;
+}
+
+html[data-bs-theme='dark'] .tag-item.market-skill {
+    background: #132a27;
+    border-color: #2b6660;
+    color: #b7f2e9;
+}
+
+html[data-bs-theme='dark'] .market-skills-container {
+    background: #0d2422;
+    border-color: #2a5d58;
+}
+
+html[data-bs-theme='dark'] .form-control,
+html[data-bs-theme='dark'] .form-select {
+    background: #0b1525;
+    border-color: #2b405f;
+    color: #dbe7f5;
+}
+
+html[data-bs-theme='dark'] .form-control::placeholder {
+    color: #7f96ad;
+}
+
+html[data-bs-theme='dark'] .manual-form .form-label {
+    color: #c3d5e8;
+}
+
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: rgba(7, 15, 30, 0.66);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-content {
+    text-align: center;
+    color: #eff4ff;
+}
+
+@media (max-width: 1080px) {
+    .dashboard-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-sidebar {
+        position: relative;
+        height: auto;
+    }
+
+    .dashboard-main {
+        padding: 20px;
+    }
+
+    .hero-panel {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .input-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-main {
+        padding: 14px;
+    }
+
+    .section-header h2 {
+        font-size: 1.25rem;
+    }
+}

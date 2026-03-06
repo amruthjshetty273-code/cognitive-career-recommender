@@ -32,6 +32,7 @@ const AuthModule = {
         this.setupEventListeners();
         this.initializePasswordToggles();
         this.initializeFormValidation();
+        this.initializeTermsGate();
     }
 };
 
@@ -49,6 +50,11 @@ AuthModule.setupEventListeners = function() {
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+
+        // Clear login errors as soon as user starts correcting input.
+        loginForm.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => this.clearInlineAlerts());
+        });
     }
     
     // Registration form
@@ -281,14 +287,27 @@ AuthModule.updatePasswordRequirements = function(password) {
         const element = document.getElementById(req.id);
         if (element) {
             element.classList.toggle('text-success', req.met);
-            element.classList.toggle('text-danger', !req.met);
-            element.classList.remove('text-muted');
+            element.classList.toggle('text-muted', !req.met);
             const icon = element.querySelector('i');
             if (icon) {
-                icon.className = req.met ? 'fas fa-check me-1' : 'fas fa-times me-1';
+                icon.className = req.met ? 'fas fa-check me-1' : 'fas fa-circle me-1';
             }
         }
     });
+};
+
+AuthModule.initializeTermsGate = function() {
+    const termsCheckbox = document.getElementById('terms_accepted');
+    const registerBtn = document.getElementById('registerBtn');
+
+    if (!termsCheckbox || !registerBtn) return;
+
+    const syncButtonState = () => {
+        registerBtn.disabled = !termsCheckbox.checked || this.state.isSubmitting;
+    };
+
+    termsCheckbox.addEventListener('change', syncButtonState);
+    syncButtonState();
 };
 
 AuthModule.validatePasswordMatch = function() {
@@ -381,15 +400,41 @@ AuthModule.submitForm = async function(url, formData) {
             credentials: 'same-origin',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
                 ...(csrfToken ? { 'X-CSRFToken': csrfToken } : {})
             }
         });
-        
-        const data = await response.json();
+
+        const rawBody = await response.text();
+        let data = null;
+
+        // Prefer JSON responses, but gracefully handle HTML error pages and redirects.
+        try {
+            data = rawBody ? JSON.parse(rawBody) : {};
+        } catch (parseError) {
+            if (response.redirected && response.url) {
+                return {
+                    success: true,
+                    redirect_url: response.url,
+                    message: 'Request completed successfully.'
+                };
+            }
+
+            const plainText = rawBody
+                .replace(/<[^>]*>/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            if (!response.ok && plainText) {
+                throw new Error(plainText.slice(0, 220));
+            }
+
+            throw new Error('Server returned an unexpected response format.');
+        }
         
         // Check if response is successful
         if (!response.ok) {
-            throw new Error(data.message || 'Request failed');
+            throw new Error(data.message || data.error || 'Request failed');
         }
         
         return data;
@@ -577,8 +622,13 @@ AuthModule.setSubmissionState = function(isSubmitting, loadingText = 'Loading...
     } else {
         if (btnText) btnText.classList.remove('d-none');
         if (btnLoading) btnLoading.classList.add('d-none');
-        submitButton.disabled = false;
+        const termsCheckbox = document.getElementById('terms_accepted');
+        submitButton.disabled = termsCheckbox ? !termsCheckbox.checked : false;
     }
+};
+
+AuthModule.clearInlineAlerts = function() {
+    document.querySelectorAll('.alert').forEach(alert => alert.remove());
 };
 
 /**
@@ -645,7 +695,8 @@ AuthModule.showAlert = function(type, message) {
 
     alertContainer.insertAdjacentHTML('afterbegin', alertHTML);
 
-    // Fade out after 8 seconds, but allow manual close
+    // Fade out quickly for auth errors to reduce noise.
+    const removeDelay = type === 'error' ? 3000 : 5000;
     setTimeout(() => {
         const alertElem = document.getElementById(alertId);
         if (alertElem) {
@@ -653,7 +704,7 @@ AuthModule.showAlert = function(type, message) {
             alertElem.classList.add('fade');
             setTimeout(() => { if (alertElem) alertElem.remove(); }, 500);
         }
-    }, 8000);
+    }, removeDelay);
 };
 
 AuthModule.showPasswordResetSuccess = function(email) {

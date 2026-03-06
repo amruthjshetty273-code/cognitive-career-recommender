@@ -17,6 +17,7 @@ import tempfile
 import shutil
 import smtplib
 import re
+import json
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from functools import wraps
@@ -31,35 +32,63 @@ from nlp_processor.resume_analyzer import ResumeAnalyzer
 from nlp_processor.resume_analyzer_simple import SimpleResumeAnalyzer
 from utils.data_processor import DataProcessor
 from config import Config
+from models import db, User, UserProfile, UserSkill
+from services.auth_service import AuthService
 
 app = Flask(__name__,
             template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend', 'templates'),
             static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend', 'static'))
 app.config.from_object(Config)
+Config.init_app(app)
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 # Resend verification email route (moved here so 'app' is defined)
 @app.route('/resend-verification', methods=['POST'])
 def resend_verification():
     email = request.form.get('email', '').strip().lower()
-    user = users_db.get(email)
+    user = User.query.filter_by(email=email).first()
     if not user:
         flash('User not found.', 'error')
         return redirect(url_for('verify_email_notice', email=email))
-    if user.get('email_verified', False):
+    if user.email_verified:
         flash('Email already verified. Please log in.', 'info')
         return redirect(url_for('login'))
     # Generate new token
     verification_token = secrets.token_urlsafe(32)
-    user['verification_token'] = verification_token
+    user.email_verification_token = verification_token
+    db.session.commit()
     mail_username = app.config.get('MAIL_USERNAME')
     mail_configured = mail_username and mail_username != 'your-email@gmail.com'
+    first_name = (user.name or '').split(' ')[0] if user.name else ''
+    verification_url = url_for('verify_email', token=verification_token, _external=True)
+    mail_sent = False
+
+    otp_code = _generate_email_otp()
+    _save_email_otp(email, otp_code)
+
     if mail_configured:
-        send_verification_email(email, verification_token, user.get('first_name', ''))
-        flash('Verification email resent. Please check your inbox.', 'success')
+        mail_sent = send_verification_email(email, verification_token, first_name, otp_code)
+        if mail_sent:
+            flash('Verification email resent. Please check your inbox.', 'success')
+        else:
+            flash('Could not send verification email. Please check email settings.', 'warning')
     else:
-        logger.warning(f"EMAIL NOT CONFIGURED - Token: {verification_token}")
-        flash('Email not configured. Token logged to server.', 'info')
-    return redirect(url_for('verify_email_notice', email=email))
+        logger.warning(f"EMAIL NOT CONFIGURED - Verification URL: {verification_url}")
+        flash('Email service is not configured in this environment.', 'info')
+
+    notice_args = {
+        'email': email,
+        'success': 1,
+        'mail_sent': 1 if mail_sent else 0,
+    }
+    if not mail_sent and app.config.get('DEBUG'):
+        notice_args['verification_url'] = verification_url
+        notice_args['otp_hint'] = otp_code
+
+    return redirect(url_for('verify_email_notice', **notice_args))
 
 # Configure logging
 logging.basicConfig(
@@ -106,6 +135,7 @@ def add_security_headers(response):
     return response
 
 FEEDBACK_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'feedback.db')
+OTP_EXPIRY_MINUTES = 10
 
 
 def _init_feedback_db():
@@ -119,6 +149,15 @@ def _init_feedback_db():
                 role TEXT NOT NULL,
                 feedback TEXT NOT NULL,
                 created_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS email_otp (
+                email TEXT PRIMARY KEY,
+                otp_code TEXT NOT NULL,
+                expires_at TEXT NOT NULL
             )
             """
         )
@@ -173,7 +212,63 @@ def _delete_feedback(user_id, feedback_id):
         logger.error(f"Error deleting feedback: {e}")
         return False
 
-def send_verification_email(email, verification_token, first_name):
+
+def _generate_email_otp():
+    return ''.join(str(secrets.randbelow(10)) for _ in range(6))
+
+
+def _save_email_otp(email, otp_code):
+    expires_at = (datetime.now(timezone.utc) + timedelta(minutes=OTP_EXPIRY_MINUTES)).isoformat()
+    with sqlite3.connect(FEEDBACK_DB) as conn:
+        conn.execute(
+            """
+            INSERT INTO email_otp (email, otp_code, expires_at)
+            VALUES (?, ?, ?)
+            ON CONFLICT(email) DO UPDATE SET
+                otp_code = excluded.otp_code,
+                expires_at = excluded.expires_at
+            """,
+            (email, otp_code, expires_at)
+        )
+
+
+def _delete_email_otp(email):
+    with sqlite3.connect(FEEDBACK_DB) as conn:
+        conn.execute("DELETE FROM email_otp WHERE email = ?", (email,))
+
+
+def _verify_email_otp(email, otp_code):
+    with sqlite3.connect(FEEDBACK_DB) as conn:
+        cursor = conn.execute(
+            "SELECT otp_code, expires_at FROM email_otp WHERE email = ?",
+            (email,)
+        )
+        row = cursor.fetchone()
+
+    if not row:
+        return False, 'No OTP found for this email. Please request a new OTP.'
+
+    saved_code, expires_at_raw = row
+    if str(saved_code).strip() != str(otp_code).strip():
+        return False, 'Invalid OTP code. Please try again.'
+
+    try:
+        expires_at = datetime.fromisoformat(expires_at_raw)
+    except ValueError:
+        _delete_email_otp(email)
+        return False, 'OTP is invalid. Please request a new one.'
+
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+    if datetime.now(timezone.utc) > expires_at:
+        _delete_email_otp(email)
+        return False, 'OTP expired. Please request a new OTP.'
+
+    _delete_email_otp(email)
+    return True, None
+
+def send_verification_email(email, verification_token, first_name, otp_code=None):
     """Send email verification link to user"""
     try:
         # Check if email configuration is available
@@ -206,7 +301,13 @@ def send_verification_email(email, verification_token, first_name):
                     <div style="padding: 30px; background: #f5f7fa; border-radius: 0 0 8px 8px;">
                         <h2 style="color: #1b3a6b; margin-top: 0;">Hello {first_name},</h2>
                         
-                        <p>Thank you for creating an account with CareerAI! To get started with your personalized career recommendations, please verify your email address by clicking the link below.</p>
+                        <p>Thank you for creating an account with CareerAI! To get started with your personalized career recommendations, please verify your email address by clicking the link below or using the OTP code.</p>
+
+                        <div style="margin: 14px 0 24px 0; padding: 14px; background: #ffffff; border: 1px dashed #275395; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 13px; color: #555; margin-bottom: 6px;">Your verification OTP</div>
+                            <div style="font-size: 28px; letter-spacing: 4px; font-weight: 700; color: #1b3a6b;">{otp_code or ''}</div>
+                            <div style="font-size: 12px; color: #666; margin-top: 6px;">Valid for {OTP_EXPIRY_MINUTES} minutes</div>
+                        </div>
                         
                         <div style="text-align: center; margin: 30px 0;">
                             <a href="{verification_link}" style="display: inline-block; background: linear-gradient(135deg, #1b3a6b, #275395); color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
@@ -239,7 +340,9 @@ def send_verification_email(email, verification_token, first_name):
         text_content = f"""
         Hello {first_name},
         
-        Thank you for creating an account with CareerAI! To get started with your personalized career recommendations, please verify your email address by clicking the link below:
+        Thank you for creating an account with CareerAI! To get started with your personalized career recommendations, please verify your email address by clicking the link below or using this OTP code:
+
+        OTP: {otp_code or ''}
         
         {verification_link}
         
@@ -422,6 +525,110 @@ def _build_structured_profile(resume_data):
     logger.debug(f"Final profile - skills count: {len(result['skills'])}")
     return result
 
+
+def _normalize_skill_tokens(raw_skills):
+    if not raw_skills:
+        return []
+    if isinstance(raw_skills, str):
+        tokens = raw_skills.split(',')
+    elif isinstance(raw_skills, list):
+        tokens = raw_skills
+    else:
+        return []
+
+    cleaned = []
+    for token in tokens:
+        text = str(token).strip()
+        if text:
+            cleaned.append(text)
+    # Deduplicate while preserving order.
+    return list(dict.fromkeys(cleaned))
+
+
+def _extract_years(profile_payload):
+    experience = profile_payload.get('experience', []) if isinstance(profile_payload, dict) else []
+    total = 0.0
+    if isinstance(experience, list):
+        for entry in experience:
+            try:
+                total += float(entry.get('years', 0))
+            except (TypeError, ValueError, AttributeError):
+                continue
+    return total
+
+
+def _save_user_profile_snapshot(user, profile_payload):
+    """Persist a normalized profile snapshot for dashboard auto-restore."""
+    if not user or not isinstance(profile_payload, dict):
+        return
+
+    skills = _normalize_skill_tokens(profile_payload.get('skills', []))
+    interests = _normalize_skill_tokens(profile_payload.get('interests', []))
+    years = _extract_years(profile_payload)
+
+    education_level = None
+    education = profile_payload.get('education', {})
+    if isinstance(education, dict):
+        degrees = education.get('degrees', [])
+        if isinstance(degrees, list) and degrees:
+            education_level = str(degrees[0]).strip() or None
+
+    profile = UserProfile.query.filter_by(user_id=user.id).first()
+    if not profile:
+        profile = UserProfile(user_id=user.id)
+        db.session.add(profile)
+
+    profile.education_level = education_level
+    profile.experience_years = years
+    profile.preferred_domains = ', '.join(interests)
+
+    completeness = 0
+    if education_level:
+        completeness += 25
+    if years > 0:
+        completeness += 25
+    if skills:
+        completeness += 35
+    if interests:
+        completeness += 15
+    profile.profile_completeness = float(min(100, completeness))
+
+    # Replace skill rows with latest snapshot.
+    UserSkill.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+    for skill in skills:
+        db.session.add(UserSkill(user_id=user.id, skill_name=skill, years_experience=years))
+
+    db.session.commit()
+
+
+def _load_user_profile_snapshot(user):
+    """Build dashboard-friendly payload from persisted DB profile tables."""
+    if not user:
+        return None
+
+    profile = UserProfile.query.filter_by(user_id=user.id).first()
+    skills = UserSkill.query.filter_by(user_id=user.id).all()
+
+    skill_names = [s.skill_name for s in skills if s.skill_name]
+    interests = []
+    years = 0.0
+    education_level = ''
+
+    if profile:
+        interests = [x.strip() for x in (profile.preferred_domains or '').split(',') if x.strip()]
+        years = float(profile.experience_years or 0)
+        education_level = (profile.education_level or '').strip()
+
+    if not skill_names and not interests and years <= 0 and not education_level:
+        return None
+
+    return {
+        'skills': skill_names,
+        'interests': interests,
+        'education': {'degrees': [education_level] if education_level else []},
+        'experience': [{'years': years}] if years > 0 else []
+    }
+
 def login_required(f):
     """Decorator to require login AND email verification for protected routes"""
     @wraps(f)
@@ -469,8 +676,6 @@ def login():
 
         # Account lockout logic
         if user:
-            from datetime import datetime, timedelta, timezone
-            now = datetime.now(timezone.utc)
             # Check if account is locked
             if user.lockout_until and user.lockout_until > now:
                 session.clear()
@@ -538,10 +743,6 @@ def validate_password_strength(password):
     
     return errors
 
-from services.auth_service import AuthService
-from models import db, User
-
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """Handle user registration (DB-backed, with email verification)"""
@@ -584,27 +785,39 @@ def register():
 
         mail_username = app.config.get('MAIL_USERNAME')
         mail_configured = mail_username and mail_username != 'your-email@gmail.com'
+        verification_url = url_for('verify_email', token=verification_token, _external=True)
+        otp_code = _generate_email_otp()
+        _save_email_otp(email, otp_code)
+        mail_sent = False
         if mail_configured:
-            send_verification_email(email, verification_token, first_name)
-            if is_ajax:
-                return jsonify({
-                    'success': True,
-                    'redirect_url': f'/verify-email-notice?success=1&email={email}',
-                    'message': 'Account created! Please check your email to verify your account.'
-                })
-            else:
-                return render_template('auth/register.html', success=True)
+            mail_sent = send_verification_email(email, verification_token, first_name, otp_code)
+            if not mail_sent:
+                logger.warning(f"EMAIL DELIVERY FAILED - Verification URL: {verification_url}")
         else:
-            verification_url = f"http://localhost:5000/verify-email/{verification_token}"
             logger.warning(f"EMAIL NOT CONFIGURED - Verification URL: {verification_url}")
-            if is_ajax:
-                return jsonify({
-                    'success': True,
-                    'redirect_url': f'/verify-email-notice?success=1&email={email}',
-                    'message': 'Account created! Please check your email to verify your account.'
-                })
-            else:
-                return render_template('auth/register.html', success=True)
+
+        notice_args = {
+            'success': 1,
+            'email': email,
+            'mail_sent': 1 if mail_sent else 0,
+        }
+        if not mail_sent and app.config.get('DEBUG'):
+            notice_args['verification_url'] = verification_url
+            notice_args['otp_hint'] = otp_code
+
+        notice_url = url_for('verify_email_notice', **notice_args)
+        if is_ajax:
+            message = (
+                'Account created! Verification email sent. Please check your inbox.'
+                if mail_sent
+                else 'Account created, but email could not be sent in this environment. Use the verification link shown on the next page.'
+            )
+            return jsonify({
+                'success': True,
+                'redirect_url': notice_url,
+                'message': message
+            })
+        return redirect(notice_url)
     # Always return JSON for AJAX GET requests
     if is_ajax:
         return jsonify({'success': False, 'message': 'GET not supported for registration'}), 405
@@ -635,12 +848,42 @@ def verify_email(token):
         user.email_verified = True
         user.email_verification_token = None
         db.session.commit()
+        _delete_email_otp(user.email)
         flash('Email verified successfully! Please complete your profile.', 'success')
         session['user_id'] = user.email
         # Redirect to profile setup page after verification
-        return redirect(url_for('profile_setup'))
+        return redirect(url_for('profile'))
     flash('Invalid or expired verification link.', 'error')
     return redirect(url_for('index'))
+
+
+@app.route('/verify-email-code', methods=['POST'])
+def verify_email_code():
+    """Verify user email with a 6-digit OTP code."""
+    email = request.form.get('email', '').strip().lower()
+    otp_code = request.form.get('otp_code', '').strip()
+
+    if not email or not otp_code:
+        flash('Email and OTP code are required.', 'error')
+        return redirect(url_for('verify_email_notice', email=email, mail_sent=request.args.get('mail_sent', 0)))
+
+    user = User.query.filter_by(email=email, email_verified=False).first()
+    if not user:
+        flash('User not found or already verified.', 'error')
+        return redirect(url_for('login'))
+
+    valid, reason = _verify_email_otp(email, otp_code)
+    if not valid:
+        flash(reason or 'Invalid OTP code.', 'error')
+        return redirect(url_for('verify_email_notice', email=email, success=1, mail_sent=1))
+
+    user.email_verified = True
+    user.email_verification_token = None
+    db.session.commit()
+
+    flash('Email verified successfully using OTP! Please complete your profile.', 'success')
+    session['user_id'] = user.email
+    return redirect(url_for('profile'))
 # Profile setup route
 def db_login_required(f):
     @wraps(f)
@@ -673,24 +916,20 @@ def forgot_password():
     """Handle forgot password requests"""
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
-        
-        if email in users_db:
-            # In a real app, you'd send an email with reset link
-            flash('Password reset instructions have been sent to your email.', 'info')
-            return jsonify({
-                'success': True,
-                'message': 'Password reset instructions sent to your email.'
-            })
-        else:
-            flash('Email address not found.', 'error')
-            return jsonify({
-                'success': False,
-                'message': 'Email address not found.'
-            }), 404
+
+        user_exists = User.query.filter_by(email=email).first() is not None
+        if user_exists:
+            # In a real app, you would send a reset email here.
+            logger.info(f"Password reset requested for {email}")
+
+        flash('If this email is registered, password reset instructions have been sent.', 'info')
+        return jsonify({
+            'success': True,
+            'message': 'If this email is registered, password reset instructions have been sent.'
+        })
     
     return render_template('auth/forgot_password.html')
 
-@app.route('/dashboard')
 @app.route('/dashboard')
 @db_login_required
 def dashboard():
@@ -700,8 +939,18 @@ def dashboard():
     logger.info(f"Dashboard accessed by user: {user_email}")
     return render_template('dashboard/index.html', user=user)
 
+
+@app.route('/api/profile/current', methods=['GET'])
+@db_login_required
+def get_current_profile():
+    """Return persisted profile snapshot for dashboard auto-load."""
+    user_email = session.get('user_id')
+    user = User.query.filter_by(email=user_email).first()
+    profile_payload = _load_user_profile_snapshot(user)
+    return jsonify({'has_profile': bool(profile_payload), 'profile': profile_payload or {}})
+
 @app.route('/upload_resume', methods=['GET', 'POST'])
-@login_required
+@db_login_required
 def upload_resume():
     """Handle resume upload and analysis"""
     if request.method == 'POST':
@@ -763,6 +1012,10 @@ def upload_resume():
                         resume_data = resume_analyzer.extract_information(f)
                     if resume_data and not resume_data.get('error'):
                         structured_profile = _build_structured_profile(resume_data)
+                        user_email = session.get('user_id')
+                        user = User.query.filter_by(email=user_email).first() if user_email else None
+                        if user:
+                            _save_user_profile_snapshot(user, structured_profile)
                         logger.info(f"Resume parsed successfully using primary analyzer")
                         return jsonify({
                             'resume_data': resume_data,
@@ -779,6 +1032,10 @@ def upload_resume():
                         f.filename = file.filename
                         resume_data = simple_analyzer.extract_information(f)
                     structured_profile = _build_structured_profile(resume_data)
+                    user_email = session.get('user_id')
+                    user = User.query.filter_by(email=user_email).first() if user_email else None
+                    if user:
+                        _save_user_profile_snapshot(user, structured_profile)
                     logger.info(f"Resume parsed successfully using fallback analyzer")
                     return jsonify({
                         'resume_data': resume_data,
@@ -797,10 +1054,12 @@ def upload_resume():
             except Exception as e:
                 logger.warning(f"Failed to clean up temp directory: {e}")
     
-    return render_template('upload_resume.html')
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'error': 'Use POST to upload a resume.'}), 405
+    return redirect(url_for('dashboard'))
 
 @app.route('/analyze_profile', methods=['POST'])
-@login_required
+@db_login_required
 def analyze_profile():
     """Analyze user profile and generate recommendations"""
     try:
@@ -810,6 +1069,14 @@ def analyze_profile():
 
     if not user_data:
         return jsonify({'error': 'Missing profile data'}), 400
+
+    user_email = session.get('user_id')
+    user = User.query.filter_by(email=user_email).first()
+    if user:
+        try:
+            _save_user_profile_snapshot(user, user_data)
+        except Exception as e:
+            logger.warning(f"Could not persist user profile snapshot: {e}")
 
     try:
         match_results = match_roles(user_data)
@@ -823,7 +1090,7 @@ def analyze_profile():
     })
 
 @app.route('/feedback', methods=['POST'])
-@login_required
+@db_login_required
 def collect_feedback():
     """Collect user feedback for adaptive learning"""
     try:
@@ -860,7 +1127,7 @@ def collect_feedback():
 
 
 @app.route('/api/feedback', methods=['GET'])
-@login_required
+@db_login_required
 def get_feedback_history():
     """Return feedback history for the current user"""
     user_id = session.get('user_id')
@@ -869,7 +1136,7 @@ def get_feedback_history():
     return jsonify({'history': history})
 
 @app.route('/api/feedback/<int:feedback_id>', methods=['DELETE'])
-@login_required
+@db_login_required
 def delete_feedback_entry(feedback_id):
     """Delete a specific feedback entry"""
     user_id = session.get('user_id')

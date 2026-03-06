@@ -6,42 +6,84 @@
 {% block auth_subtitle %}Complete account setup with email verification{% endblock %}
 
 {% block auth_content %}
-<div class="text-center">
+<div class="verify-wrap">
     {% if request.args.get('success') == '1' %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert" style="max-width: 500px; margin: 0 auto 20px auto;">
-        <i class="fas fa-check-circle me-2"></i>
+    <div class="alert {{ 'alert-success' if request.args.get('mail_sent') == '1' else 'alert-warning' }} alert-dismissible fade show verify-alert" role="alert">
+        <i class="fas {{ 'fa-check-circle' if request.args.get('mail_sent') == '1' else 'fa-triangle-exclamation' }} me-2"></i>
+        {% if request.args.get('mail_sent') == '1' %}
         Account created successfully! Please check your email to verify your account.
+        {% else %}
+        Account created, but email service is not configured in this environment.
+        {% endif %}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     {% endif %}
-    <div style="margin-bottom: 30px;">
-        <i class="fas fa-envelope-open-text" style="font-size: 3rem; color: #15a6a0;"></i>
+    <div class="verify-icon-wrap">
+        <i class="fas fa-envelope-open-text"></i>
     </div>
-    <h6 style="font-size: 1.1rem; margin-bottom: 15px; color: #333;">Verification Email Sent</h6>
-    <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
+
+    {% if request.args.get('mail_sent') == '1' %}
+    <h6 class="verify-heading">Verification Email Sent</h6>
+    <p class="verify-description">
         We've sent a verification link to your email address.<br>
         Please click the link in the email to verify your account.
     </p>
-    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: left;">
-        <p style="margin: 0 0 10px 0; color: #666;"><strong>What's next?</strong></p>
-        <ul style="margin: 0; padding-left: 20px; color: #666;">
-            <li>Check your email inbox for our verification message</li>
-            <li>Click the verification link in the email</li>
-            <li>Return here and log in to your account</li>
+    {% else %}
+    <h6 class="verify-heading">Email Service Not Configured</h6>
+    <p class="verify-description">
+        In this development environment, outgoing email is currently disabled.<br>
+        Use the direct verification link below to activate your account.
+    </p>
+    {% endif %}
+
+    {% if request.args.get('email') %}
+    <p class="verify-email-target">Verification email for: <strong>{{ request.args.get('email') }}</strong></p>
+    {% endif %}
+
+    <div class="verify-panel">
+        <p class="verify-panel-title">What's next?</p>
+        <ul class="verify-list">
+            <li><i class="fas fa-inbox me-2"></i>Check your email inbox for our verification message</li>
+            <li><i class="fas fa-link me-2"></i>Click the verification link in the email</li>
+            <li><i class="fas fa-right-to-bracket me-2"></i>Return here and log in to your account</li>
         </ul>
     </div>
-    <p style="color: #999; font-size: 0.9rem; margin-bottom: 20px;">
-        Didn't receive the email? Check your spam or junk folder.<br>
-        <form method="POST" action="/resend-verification" style="display:inline;">
+
+    {% if request.args.get('email') %}
+    <div class="verify-panel otp-panel">
+        <p class="verify-panel-title">Or verify using OTP code</p>
+        <form method="POST" action="/verify-email-code" class="otp-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="email" value="{{ request.args.get('email', '') }}">
-            <button type="submit" class="btn btn-link p-0 align-baseline" style="font-size:0.95em;">Resend verification email</button>
+            <div class="otp-row">
+                <input type="text" name="otp_code" maxlength="6" pattern="[0-9]{6}" class="form-control otp-input" placeholder="Enter 6-digit OTP" required>
+                <button type="submit" class="btn btn-primary">Verify OTP</button>
+            </div>
         </form>
-    </p>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <a href="/login" class="btn btn-primary" style="text-decoration: none;">
+        {% if request.args.get('otp_hint') %}
+        <small class="text-muted d-block mt-2">Debug OTP: <code>{{ request.args.get('otp_hint') }}</code></small>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if request.args.get('verification_url') %}
+    <div class="verify-panel verify-link-panel">
+        <small class="text-muted d-block mb-1">Direct verification link:</small>
+        <a href="{{ request.args.get('verification_url') }}">{{ request.args.get('verification_url') }}</a>
+    </div>
+    {% endif %}
+
+    <div class="verify-help-text">Didn't receive the email? Check your spam or junk folder.</div>
+    <form method="POST" action="/resend-verification" class="resend-form">
+        <input type="hidden" name="email" value="{{ request.args.get('email', '') }}">
+        <button type="submit" class="btn btn-link p-0">Resend verification email</button>
+    </form>
+
+    <div class="verify-actions">
+        <a href="/login" class="btn btn-primary">
             <i class="fas fa-sign-in-alt me-2"></i>Go to Login
         </a>
-        <a href="/" class="btn btn-outline-primary" style="text-decoration: none;">
+        <a href="/" class="btn btn-outline-primary">
             <i class="fas fa-home me-2"></i>Back to Home
         </a>
     </div>

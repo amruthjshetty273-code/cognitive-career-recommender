@@ -18,6 +18,7 @@ const DashboardModule = {
         apiEndpoints: {
             uploadResume: '/upload_resume',
             analyzeProfile: '/analyze_profile',
+            currentProfile: '/api/profile/current',
             feedback: '/feedback',
             feedbackHistory: '/api/feedback',
             liveJobs: '/api/jobs'
@@ -179,6 +180,11 @@ DashboardModule.setupQuickActionEvents = function() {
     // Explore button
     document.getElementById('exploreBtn')?.addEventListener('click', () => {
         this.explorecareers();
+    });
+
+    // Live jobs empty-state CTA
+    document.getElementById('liveJobsCtaBtn')?.addEventListener('click', () => {
+        this.getPersonalizedRecommendations();
     });
     
     // Re-run Analysis button
@@ -700,17 +706,39 @@ DashboardModule.renderRecommendations = function(recommendations, userSkills) {
     const skillsLower = userSkills.map(skill => skill.toLowerCase());
     const aggregatedMissing = new Set();
 
-    // Show only suitable matches (40%+) to avoid overwhelming with low-quality results
-    // This filters out the many 25% matches and shows only relevant careers
+    // Show only suitable matches (40%+) to avoid low-quality suggestions.
+    const MIN_MATCH_SCORE = 40;
     const suitableRecs = recommendations.filter(rec => {
         const score = typeof rec.match_score === 'number' 
             ? (rec.match_score <= 1 ? rec.match_score * 100 : rec.match_score)
             : 0;
-        return score >= 40;
+        return score >= MIN_MATCH_SCORE;
     });
-    
-    // If no suitable matches found, show top 3 for awareness
-    const allRecs = suitableRecs.length > 0 ? suitableRecs : recommendations.slice(0, 3);
+
+    if (!suitableRecs.length) {
+        list.classList.add('d-none');
+        empty.classList.remove('d-none');
+
+        // Keep empty state explicit when model confidence is low.
+        const emptyTitle = empty.querySelector('h6');
+        const emptyText = empty.querySelector('p');
+        if (emptyTitle) emptyTitle.textContent = 'No Strong Career Matches Yet';
+        if (emptyText) {
+            emptyText.textContent = `Your current profile did not reach the ${MIN_MATCH_SCORE}% quality threshold. Add more relevant skills or experience and run analysis again.`;
+        }
+
+        this.state.allRecommendations = [];
+
+        const filterPanel = document.getElementById('filterPanel');
+        if (filterPanel) filterPanel.classList.add('d-none');
+
+        const rerunBtn = document.getElementById('rerunAnalysisBtn');
+        if (rerunBtn) rerunBtn.style.display = 'none';
+
+        return;
+    }
+
+    const allRecs = suitableRecs;
 
     const cards = allRecs.map((rec, index) => {
         const required = this.parseRequiredSkills(rec.required_skills);
@@ -818,10 +846,16 @@ DashboardModule.updateSkillGapSummary = function(missingSkills) {
     if (!container) return;
 
     if (!missingSkills.length) {
-        container.textContent = 'No gaps calculated yet.';
+        container.className = 'empty-state compact';
+        container.innerHTML = `
+            <i class="fas fa-chart-bar"></i>
+            <h6>No Skill Gaps Yet</h6>
+            <p>Generate recommendations to view role-wise missing skills.</p>
+        `;
         return;
     }
 
+    container.className = 'tag-list';
     container.innerHTML = missingSkills
         .slice(0, 10)
         .map(skill => `<span class="tag-item missing">${skill}</span>`)
@@ -849,11 +883,11 @@ DashboardModule.updateSkillGapSummaryWithMarketData = function(marketSkills) {
     const container = document.getElementById('skillGapList');
     if (!container) return;
 
-    // Always show container, even if no market skills (will show message)
-    container.classList.remove('empty-list');
+    // Switch from placeholder mode to tag list mode when rendering market skills.
+    container.className = 'tag-list';
 
     if (!marketSkills || Object.keys(marketSkills).length === 0) {
-        container.innerHTML = '<div class="alert alert-info">Analyzing market data...</div>';
+        container.innerHTML = '<span class="empty-list">Analyzing market data...</span>';
         return;
     }
 
@@ -869,12 +903,12 @@ DashboardModule.updateSkillGapSummaryWithMarketData = function(marketSkills) {
             // Adjusted thresholds for realistic sample sizes (15 jobs)
             // 10+ = 66% of jobs = High demand | 6-9 = 40-60% = Medium | <6 = Emerging  
             const demandLevel = frequency >= 10 ? 'high' : frequency >= 6 ? 'medium' : 'low';
-            const demandIcon = frequency >= 10 ? '🔴' : frequency >= 6 ? '🟡' : '🟢';
+            const demandLabel = frequency >= 10 ? 'High' : frequency >= 6 ? 'Medium' : 'Good';
             const title = `Appears in ${frequency} real job listings from Adzuna API`;
             
             return `<span class="tag-item market-skill" title="${title}" data-demand="${demandLevel}">
                 <strong>${skill}</strong>
-                <span style="font-size: 0.8em; margin-left: 6px; opacity: 0.8;">${demandIcon} ${frequency}</span>
+                <span style="font-size: 0.8em; margin-left: 6px; opacity: 0.85;">${demandLabel} (${frequency})</span>
             </span>`;
         })
         .join('');
@@ -937,7 +971,7 @@ DashboardModule.updateRoadmapWithMarketData = function(marketSkills, userSkills)
         roadmapHtml += existingSkills
             .map(({ skill, frequency }) => {
                 const jobCount = frequency > 100 ? '100+' : frequency;
-                const demandBadge = frequency >= 10 ? '🔴 High' : frequency >= 6 ? '🟡 Medium' : '🟢 Good';
+                const demandBadge = frequency >= 10 ? 'High' : frequency >= 6 ? 'Medium' : 'Good';
                 return `<li style="margin-left: 1.5rem; margin-bottom: 0.3rem;">
                     <strong>${skill}</strong> <span style="font-size: 0.85em; color: #059669;">${demandBadge} demand (${jobCount} jobs)</span>
                     <br><small style="color: #6b7280;">Advanced projects to deepen expertise</small>
@@ -956,7 +990,7 @@ DashboardModule.updateRoadmapWithMarketData = function(marketSkills, userSkills)
         roadmapHtml += newSkills
             .map(({ skill, frequency }, index) => {
                 const jobCount = frequency > 100 ? '100+' : frequency;
-                const demandBadge = frequency >= 10 ? '🔴 High' : frequency >= 6 ? '🟡 Medium' : '🟢 Good';
+                const demandBadge = frequency >= 10 ? 'High' : frequency >= 6 ? 'Medium' : 'Good';
                 return `<li style="margin-left: 1.5rem; margin-bottom: 0.3rem;">
                     <strong>${index + 1}. ${skill}</strong> <span style="font-size: 0.85em; color: #3b82f6;">${demandBadge} demand (${jobCount} jobs)</span>
                     <br><small style="color: #6b7280;">Online courses → Real projects → GitHub → Job applications</small>
@@ -1019,9 +1053,15 @@ DashboardModule.loadFeedbackHistory = function() {
         .then(response => response.json())
         .then(data => {
             if (!data.history || !data.history.length) {
-                list.textContent = 'No feedback captured yet.';
+                list.className = 'empty-state compact';
+                list.innerHTML = `
+                    <i class="fas fa-comments"></i>
+                    <h6>No Feedback History Yet</h6>
+                    <p>Rate recommendations and your feedback history will appear here.</p>
+                `;
                 return;
             }
+            list.className = '';
             list.innerHTML = data.history
                 .map(item => {
                     const badgeClass = item.feedback === 'Relevant' ? 'success' : 'secondary';
@@ -1107,7 +1147,11 @@ DashboardModule.updateProfileCompletion = function(profile) {
     }
     
     // Check education (20%)
-    if (profile && profile.education && profile.education.degree && profile.education.degree.length > 0) {
+    const hasEducation = profile && profile.education && (
+        (typeof profile.education.degree === 'string' && profile.education.degree.length > 0) ||
+        (Array.isArray(profile.education.degrees) && profile.education.degrees.length > 0)
+    );
+    if (hasEducation) {
         completionScore += 1;
     }
     
@@ -1340,8 +1384,64 @@ DashboardModule.hideModal = function() {
  * ========================================
  */
 DashboardModule.loadUserData = function() {
-    // Load user data from server or local storage
     this.state.currentUser = null;
+
+    fetch(this.config.apiEndpoints.currentProfile, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Could not load saved profile.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data || !data.has_profile || !data.profile) {
+                return;
+            }
+
+            const profile = data.profile;
+            this.populateManualProfileForm(profile);
+            this.state.lastProfile = profile;
+            this.state.lastSkills = Array.isArray(profile.skills) ? profile.skills : [];
+            this.updateProfileCompletion(profile);
+            this.setProfileStatus('Saved profile loaded');
+
+            if (this.state.lastProfile) {
+                this.submitProfileForAnalysis(this.state.lastProfile, this.state.lastSkills);
+            }
+        })
+        .catch(error => {
+            console.warn('Profile auto-load skipped:', error);
+        });
+};
+
+DashboardModule.populateManualProfileForm = function(profile) {
+    if (!profile || typeof profile !== 'object') return;
+
+    const educationLevel = profile.education && Array.isArray(profile.education.degrees)
+        ? (profile.education.degrees[0] || '')
+        : '';
+
+    const yearsExperience = Array.isArray(profile.experience) && profile.experience.length
+        ? (profile.experience[0].years || 0)
+        : 0;
+
+    const skills = Array.isArray(profile.skills) ? profile.skills.join(', ') : '';
+    const interests = Array.isArray(profile.interests) ? profile.interests.join(', ') : '';
+
+    const educationEl = document.getElementById('educationLevel');
+    const yearsEl = document.getElementById('yearsExperience');
+    const skillsEl = document.getElementById('skillsInput');
+    const interestsEl = document.getElementById('interestArea');
+
+    if (educationEl) educationEl.value = educationLevel;
+    if (yearsEl) yearsEl.value = yearsExperience || '';
+    if (skillsEl) skillsEl.value = skills;
+    if (interestsEl) interestsEl.value = interests;
 };
 
 window.DashboardModule = DashboardModule;

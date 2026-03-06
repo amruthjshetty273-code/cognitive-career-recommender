@@ -1,37 +1,58 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerAI | Cognitive Job Matching</title>
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="dashboard.css">
-</head>
-<body class="fade-in">
+:root {
+    --primary: #1b3a6b;
+    --secondary: #15a6a0;
+    --text: #0f172a;
+    --muted: #64748b;
+    --surface: #ffffff;
+    --bg: #f5f7fa;
+}
 
-    <nav class="navbar navbar-expand-lg border-bottom">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-brain me-2"></i> CareerAI
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/dashboard">Dashboard</a>
-                <button id="theme-toggle" class="btn btn-sm ms-3">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
-        </div>
-    </nav>
+html[data-bs-theme='dark'] {
+    --primary: #6ea8fe;
+    --secondary: #4fd1c5;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --surface: #111827;
+    --bg: #0b1220;
+}
 
-    <main class="container py-5">
-        {% block content %}{% endblock %}
-    </main>
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Work Sans', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
 
-    <footer class="py-4 mt-auto border-top">
-        <div class="container text-center">
-            <p class="text-muted small">&copy; 2026 Cognitive Career AI. Powered by Gemini 3 Flash.</p>
-        </div>
-    </footer>
+a {
+    color: var(--primary);
+}
 
-</body>
-</html>
+a:hover {
+    color: #143257;
+}
+
+html[data-bs-theme='dark'] a:hover {
+    color: #93c5fd;
+}
+
+.alert-container,
+.auth-card-body .alert {
+    margin-bottom: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), #275395);
+    border-color: transparent;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: linear-gradient(135deg, #143257, #1f4c88);
+    border-color: transparent;
+}
+
+.text-muted {
+    color: var(--muted) !important;
+}

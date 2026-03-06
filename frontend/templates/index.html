@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CareerAI - Skill-Based Career Recommender</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -17,11 +18,9 @@
             --danger: #ef4444;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: 'Work Sans', sans-serif;
@@ -31,7 +30,6 @@
             line-height: 1.6;
         }
 
-        /* Navigation */
         nav {
             background: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -54,9 +52,7 @@
             transition: color 0.3s ease;
         }
 
-        .nav-link:hover {
-            color: var(--primary);
-        }
+        .nav-link:hover { color: var(--primary); }
 
         .nav-buttons .btn {
             margin: 0 0.5rem;
@@ -80,7 +76,6 @@
             border: 2px solid var(--primary);
         }
 
-        /* Hero Section */
         .hero {
             padding: 90px 20px 70px;
             background: radial-gradient(circle at top right, rgba(21, 166, 160, 0.12), transparent 55%),
@@ -110,10 +105,7 @@
             line-height: 1.6;
         }
 
-        .hero-buttons {
-            display: flex;
-            gap: 12px;
-        }
+        .hero-buttons { display: flex; gap: 12px; }
 
         .hero-buttons .btn {
             padding: 12px 30px;
@@ -162,30 +154,30 @@
             font-weight: 700;
             margin-bottom: 14px;
             color: var(--dark);
+            font-size: 1.1rem;
         }
 
-        .preview-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 0.95rem;
+        .preview-group {
+            margin-top: 14px;
+            border-top: 1px solid #eceff5;
+            padding-top: 12px;
         }
 
-        .preview-row:last-child {
-            border-bottom: none;
-        }
-
-        .preview-label {
-            color: #666;
-            font-weight: 600;
-        }
-
-        .preview-value {
-            color: var(--dark);
+        .preview-group h5 {
+            font-size: 0.92rem;
             font-weight: 700;
-            text-align: right;
+            margin-bottom: 8px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .preview-list {
+            margin: 0;
+            padding-left: 18px;
+            color: #334155;
+            font-size: 0.92rem;
+            line-height: 1.55;
         }
 
         .preview-note {
@@ -198,7 +190,6 @@
             font-size: 0.92rem;
         }
 
-        /* Problem Solution Section */
         .problem-solution {
             padding: 80px 20px;
             background: white;
@@ -227,44 +218,33 @@
             border-bottom: 1px solid #eee;
         }
 
-        .ps-item:last-child {
-            border-bottom: none;
-        }
+        .ps-item:last-child { border-bottom: none; }
 
         .ps-title {
             display: flex;
             align-items: center;
-            font-weight: 700;
+            font-weight: 650;
             margin-bottom: 8px;
             color: var(--dark);
+            font-size: 0.98rem;
         }
 
         .ps-icon {
             width: 30px;
             height: 30px;
-            border-radius: 50%;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 12px;
             color: white;
             font-weight: bold;
+            font-size: 0.85rem;
         }
 
-        .problem .ps-icon {
-            background: var(--danger);
-        }
+        .problem .ps-icon { background: var(--danger); }
+        .solution .ps-icon { background: var(--secondary); }
 
-        .solution .ps-icon {
-            background: var(--secondary);
-        }
-
-        .ps-desc {
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        /* Core Features Section */
         .why-different {
             padding: 80px 20px;
             background: var(--light);
@@ -282,7 +262,7 @@
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 26px;
+            gap: 34px 26px;
             max-width: 1100px;
             margin: 0 auto;
         }
@@ -321,16 +301,12 @@
             line-height: 1.6;
         }
 
-        /* How It Works */
         .how-it-works {
             padding: 80px 20px;
             background: white;
         }
 
-        .works-container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+        .works-container { max-width: 900px; margin: 0 auto; }
 
         .steps-grid {
             display: grid;
@@ -373,7 +349,6 @@
             font-size: 0.95rem;
         }
 
-        /* Example Output Section */
         .example-output {
             padding: 80px 20px;
             background: var(--light);
@@ -396,11 +371,7 @@
             color: var(--dark);
         }
 
-        .output-text p {
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.8;
-        }
+        .output-text p { color: #666; margin-bottom: 20px; line-height: 1.8; }
 
         .sample-result {
             background: white;
@@ -410,13 +381,8 @@
             border-left: 5px solid var(--accent);
         }
 
-        .result-item {
-            margin-bottom: 20px;
-        }
-
-        .result-item:last-child {
-            margin-bottom: 0;
-        }
+        .result-item { margin-bottom: 20px; }
+        .result-item:last-child { margin-bottom: 0; }
 
         .result-label {
             font-weight: 700;
@@ -425,10 +391,7 @@
             margin-bottom: 8px;
         }
 
-        .result-value {
-            color: #666;
-            font-size: 0.95rem;
-        }
+        .result-value { color: #666; font-size: 0.95rem; }
 
         .result-explanation {
             background: linear-gradient(135deg, rgba(0, 191, 166, 0.1) 0%, rgba(255, 183, 3, 0.05) 100%);
@@ -438,7 +401,6 @@
             border-left: 4px solid var(--secondary);
         }
 
-        /* CTA Section */
         .cta-final {
             padding: 70px 20px;
             background: linear-gradient(135deg, var(--primary) 0%, #122747 100%);
@@ -453,11 +415,7 @@
             margin-bottom: 15px;
         }
 
-        .cta-text p {
-            font-size: 1.05rem;
-            margin-bottom: 30px;
-            opacity: 0.95;
-        }
+        .cta-text p { font-size: 1.05rem; margin-bottom: 30px; opacity: 0.95; }
 
         .cta-button {
             background: var(--accent);
@@ -472,13 +430,12 @@
         }
 
         .cta-button:hover {
-            background: #FFA500;
+            background: #ffa500;
             transform: translateY(-3px);
             box-shadow: 0 8px 30px rgba(255, 183, 3, 0.5);
             color: var(--dark);
         }
 
-        /* Footer */
         footer {
             background: #0f0f0f;
             color: white;
@@ -488,9 +445,17 @@
         .footer-content {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 40px;
-            max-width: 1300px;
+            gap: 22px;
+            max-width: 1200px;
             margin: 0 auto 40px;
+        }
+
+        .footer-section {
+            background: #121825;
+            border: 1px solid #202a3a;
+            border-radius: 12px;
+            padding: 20px 22px;
+            min-height: 210px;
         }
 
         .footer-section h5 {
@@ -502,18 +467,13 @@
 
         .footer-section p {
             color: #aaa;
-            line-height: 1.8;
+            line-height: 1.7;
             margin-bottom: 15px;
             font-size: 0.95rem;
         }
 
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 12px;
-        }
+        .footer-section ul { list-style: none; }
+        .footer-section ul li { margin-bottom: 12px; }
 
         .footer-section ul li a {
             color: #b0b7c3;
@@ -522,9 +482,7 @@
             font-size: 0.95rem;
         }
 
-        .footer-section ul li a:hover {
-            color: #ffffff;
-        }
+        .footer-section ul li a:hover { color: #ffffff; }
 
         .footer-bottom {
             border-top: 1px solid #333;
@@ -534,62 +492,32 @@
             font-size: 0.9rem;
         }
 
-        /* Animations */
+        .footer-list-icon {
+            width: 16px;
+            margin-right: 10px;
+            color: #8aa1c8;
+            text-align: center;
+        }
+
         .fade-in {
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
 
-        .fade-in.in-view {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .fade-in.in-view { opacity: 1; transform: translateY(0); }
 
-        /* Responsive */
         @media (max-width: 992px) {
-            .hero-content {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-text h1 {
-                font-size: 2.2rem;
-            }
-
-            .ps-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .steps-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
-            }
-
-            .steps-grid::before {
-                display: none;
-            }
-
-            .step-circle {
-                width: 60px;
-                height: 60px;
-                font-size: 1rem;
-            }
-
-            .step-label {
-                font-size: 0.85rem;
-            }
-
-            .output-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .footer-content {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .hero-content { grid-template-columns: 1fr; }
+            .hero-text h1 { font-size: 2.2rem; }
+            .ps-grid { grid-template-columns: 1fr; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .steps-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+            .step-circle { width: 60px; height: 60px; font-size: 1rem; }
+            .step-label { font-size: 0.85rem; }
+            .output-grid { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: repeat(2, 1fr); }
+            .footer-section { min-height: 180px; }
         }
 
         @media (max-width: 768px) {
@@ -599,89 +527,29 @@
                 gap: 0.5rem;
                 margin-top: 0.75rem;
             }
-
-            .nav-buttons .btn {
-                width: 100%;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .steps-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-            }
-
-            .step-circle {
-                width: 55px;
-                height: 55px;
-                font-size: 0.95rem;
-            }
-
-            .step-label {
-                font-size: 0.8rem;
-            }
-
-            .footer-content {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-text h1 {
-                font-size: 2rem;
-            }
-
-            .section-title {
-                font-size: 1.8rem;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .hero-preview {
-                padding: 20px;
-            }
-
-            .preview-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-            }
-
-            .preview-value {
-                text-align: left;
-            }
+            .nav-buttons .btn { width: 100%; }
+            .features-grid { grid-template-columns: 1fr; }
+            .steps-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .step-circle { width: 55px; height: 55px; font-size: 0.95rem; }
+            .step-label { font-size: 0.8rem; }
+            .footer-content { grid-template-columns: 1fr; }
+            .footer-section { min-height: auto; }
+            .hero-text h1 { font-size: 2rem; }
+            .section-title { font-size: 1.8rem; }
+            .hero-buttons { flex-direction: column; align-items: stretch; }
+            .hero-preview { padding: 20px; }
         }
 
         @media (max-width: 576px) {
-            .hero {
-                padding: 70px 16px 55px;
-            }
-
-            .hero-text h1 {
-                font-size: 1.8rem;
-            }
-
-            .hero-text p {
-                font-size: 0.98rem;
-            }
-
-            .steps-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .step-circle {
-                width: 52px;
-                height: 52px;
-                font-size: 0.9rem;
-            }
+            .hero { padding: 70px 16px 55px; }
+            .hero-text h1 { font-size: 1.8rem; }
+            .hero-text p { font-size: 0.98rem; }
+            .steps-grid { grid-template-columns: repeat(2, 1fr); }
+            .step-circle { width: 52px; height: 52px; font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid ps-4 pe-4">
             <a class="navbar-brand" href="/">CareerAI</a>
@@ -690,10 +558,10 @@
             </button>
             <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="#problem">Why This</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#features">Core Features</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#how">Process</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#example">Sample Output</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#problem" title="Scroll to why this matters">Why This</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features" title="Scroll to core features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#how" title="Scroll to how it works">How It Works</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#example" title="Scroll to sample output">Sample Output</a></li>
                 </ul>
             </div>
             <div class="nav-buttons">
@@ -703,13 +571,12 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text fade-in">
-                    <h1>Cognitive Career Guidance, Built on Real Skills</h1>
-                    <p>Upload a resume or enter details manually. We convert both into the same structured profile, match roles by skill overlap, and explain every result.</p>
+                    <h1>Cognitive Career Guidance Based on Your Skills and Experience</h1>
+                    <p>Upload your resume or enter your skills manually to discover career matches and skill gaps.</p>
                     <div class="hero-buttons">
                         <a href="/register" class="btn btn-hero-primary">Get Started</a>
                         <a href="#example" class="btn btn-hero-outline">See Sample Output</a>
@@ -717,21 +584,27 @@
                 </div>
                 <div class="hero-preview fade-in">
                     <div class="preview-title">Structured Profile Snapshot</div>
-                    <div class="preview-row">
-                        <div class="preview-label">Input Mode</div>
-                        <div class="preview-value">Resume or Manual</div>
+                    <div class="preview-group">
+                        <h5>Input</h5>
+                        <ul class="preview-list">
+                            <li>Resume Upload</li>
+                            <li>Manual Entry</li>
+                        </ul>
                     </div>
-                    <div class="preview-row">
-                        <div class="preview-label">Profile Output</div>
-                        <div class="preview-value">Skills, Education, Experience</div>
+                    <div class="preview-group">
+                        <h5>Processing</h5>
+                        <ul class="preview-list">
+                            <li>Skill extraction</li>
+                            <li>Experience weighting</li>
+                        </ul>
                     </div>
-                    <div class="preview-row">
-                        <div class="preview-label">Matching Logic</div>
-                        <div class="preview-value">Weighted skill and experience scoring</div>
-                    </div>
-                    <div class="preview-row">
-                        <div class="preview-label">Output</div>
-                        <div class="preview-value">Match score, skill gaps, improvement roadmap</div>
+                    <div class="preview-group">
+                        <h5>Output</h5>
+                        <ul class="preview-list">
+                            <li>Match score</li>
+                            <li>Skill gaps</li>
+                            <li>Learning roadmap</li>
+                        </ul>
                     </div>
                     <div class="preview-note">No fake data. Every score comes from real skill matching.</div>
                 </div>
@@ -739,41 +612,39 @@
         </div>
     </section>
 
-    <!-- Problem -> Solution -->
     <section class="problem-solution" id="problem">
         <div class="container">
             <h2 class="section-title">Why This Matters</h2>
             <div class="ps-grid">
                 <div class="ps-column problem fade-in">
-                    <h3>Problems</h3>
+                    <h3>Problem</h3>
                     <div class="ps-item">
-                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-xmark"></i></span> Career choices feel vague and overwhelming</div>
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-triangle-exclamation"></i></span> Career choices feel overwhelming</div>
                     </div>
                     <div class="ps-item">
-                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-xmark"></i></span> Generic tools do not connect skills to roles</div>
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-triangle-exclamation"></i></span> Generic tools do not connect skills to roles</div>
                     </div>
                     <div class="ps-item">
-                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-xmark"></i></span> Recommendations often have no explanation</div>
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-triangle-exclamation"></i></span> Recommendations often have no explanation</div>
                     </div>
                 </div>
 
                 <div class="ps-column solution fade-in">
-                    <h3>Solutions</h3>
+                    <h3>Solution</h3>
                     <div class="ps-item">
-                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-check"></i></span> Two input modes, one structured profile</div>
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-lightbulb"></i></span> Clear skill-based role recommendations</div>
                     </div>
                     <div class="ps-item">
-                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-check"></i></span> Intelligent skill matching with experience weight</div>
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-lightbulb"></i></span> Intelligent skill matching with experience weight</div>
                     </div>
                     <div class="ps-item">
-                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-check"></i></span> Explainable reasoning plus a learning roadmap</div>
+                        <div class="ps-title"><span class="ps-icon"><i class="fas fa-lightbulb"></i></span> Explainable reasoning plus a learning roadmap</div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Core Features -->
     <section class="why-different" id="features">
         <div class="container">
             <h2 class="section-title">Core Features</h2>
@@ -785,7 +656,7 @@
                 </div>
                 <div class="feature-card fade-in">
                     <div class="feature-icon"><i class="fas fa-pen-to-square"></i></div>
-                    <h3>Manual Profile</h3>
+                    <h3>Manual Skill Entry</h3>
                     <p>Enter skills and background when a resume is not available. Same output structure.</p>
                 </div>
                 <div class="feature-card fade-in">
@@ -795,7 +666,7 @@
                 </div>
                 <div class="feature-card fade-in">
                     <div class="feature-icon"><i class="fas fa-eye"></i></div>
-                    <h3>Explainable Output</h3>
+                    <h3>Explainable Recommendations</h3>
                     <p>See matched skills and missing skills for every recommendation.</p>
                 </div>
                 <div class="feature-card fade-in">
@@ -812,51 +683,28 @@
         </div>
     </section>
 
-    <!-- How It Works -->
     <section class="how-it-works" id="how">
         <div class="container works-container">
             <h2 class="section-title">System Flow</h2>
             <div class="steps-grid">
-                <div class="single-step fade-in">
-                    <div class="step-circle">1</div>
-                    <p class="step-label">Resume or Manual Input</p>
-                </div>
-                <div class="single-step fade-in">
-                    <div class="step-circle">2</div>
-                    <p class="step-label">Text Parsing and Cleanup</p>
-                </div>
-                <div class="single-step fade-in">
-                    <div class="step-circle">3</div>
-                    <p class="step-label">Profile Structuring</p>
-                </div>
-                <div class="single-step fade-in">
-                    <div class="step-circle">4</div>
-                    <p class="step-label">Skill Match Scoring</p>
-                </div>
-                <div class="single-step fade-in">
-                    <div class="step-circle">5</div>
-                    <p class="step-label">Explainable Reasoning</p>
-                </div>
-                <div class="single-step fade-in">
-                    <div class="step-circle">6</div>
-                    <p class="step-label">Skill Gap Summary</p>
-                </div>
-                <div class="single-step fade-in">
-                    <div class="step-circle">7</div>
-                    <p class="step-label">Learning Roadmap and Feedback</p>
-                </div>
+                <div class="single-step fade-in"><div class="step-circle">1</div><p class="step-label">Input</p></div>
+                <div class="single-step fade-in"><div class="step-circle">2</div><p class="step-label">Resume Parsing</p></div>
+                <div class="single-step fade-in"><div class="step-circle">3</div><p class="step-label">Profile Structuring</p></div>
+                <div class="single-step fade-in"><div class="step-circle">4</div><p class="step-label">Skill Matching</p></div>
+                <div class="single-step fade-in"><div class="step-circle">5</div><p class="step-label">Reasoning</p></div>
+                <div class="single-step fade-in"><div class="step-circle">6</div><p class="step-label">Skill Gap Analysis</p></div>
+                <div class="single-step fade-in"><div class="step-circle">7</div><p class="step-label">Learning Roadmap</p></div>
             </div>
         </div>
     </section>
 
-    <!-- Example Output -->
     <section class="example-output" id="example">
         <div class="container">
             <div class="output-grid">
                 <div class="output-text fade-in">
                     <h3>Sample Output</h3>
-                    <p>Every recommendation is calculated using skill overlap, then explained with matched and missing skills.</p>
-                    <p>Roadmap steps are generated directly from the missing skills.</p>
+                    <p>The system compares your skills with real job requirements and calculates a match score. Missing skills are highlighted and a learning roadmap is generated.</p>
+                    <p>Each recommendation includes transparent reasoning so you know what to improve next.</p>
                     <a href="/register" class="btn btn-hero-primary" style="display: inline-block; margin-top: 10px;">Get Started</a>
                 </div>
                 <div class="sample-result fade-in">
@@ -870,9 +718,7 @@
                     </div>
                     <div class="result-item">
                         <div class="result-label">Reason</div>
-                        <div class="result-explanation">
-                            Python and SQL match required skills. Missing API testing and system design.
-                        </div>
+                        <div class="result-explanation">Python and SQL match required skills. Missing API testing and system design.</div>
                     </div>
                     <div class="result-item">
                         <div class="result-label">Skill Gap</div>
@@ -887,7 +733,6 @@
         </div>
     </section>
 
-    <!-- Final CTA -->
     <section class="cta-final">
         <div class="cta-text fade-in">
             <h2>Start Your Career Analysis</h2>
@@ -896,7 +741,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
@@ -906,34 +750,32 @@
             <div class="footer-section">
                 <h5>Start</h5>
                 <ul>
-                    <li><a href="/register">Get Started</a></li>
-                    <li><a href="/login">Login</a></li>
-                    <li><a href="/dashboard">Dashboard</a></li>
-                    <li><a href="/upload_resume">Upload Resume</a></li>
+                    <li><a href="/register"><i class="fas fa-rocket footer-list-icon"></i>Get Started</a></li>
+                    <li><a href="/login"><i class="fas fa-right-to-bracket footer-list-icon"></i>Login</a></li>
+                    <li><a href="/dashboard"><i class="fas fa-gauge-high footer-list-icon"></i>Dashboard</a></li>
+                    <li><a href="/upload_resume"><i class="fas fa-file-arrow-up footer-list-icon"></i>Upload Resume</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h5>Sections</h5>
                 <ul>
-                    <li><a href="#problem">Why This</a></li>
-                    <li><a href="#features">Core Features</a></li>
-                    <li><a href="#how">System Flow</a></li>
-                    <li><a href="#example">Sample Output</a></li>
+                    <li><a href="#problem"><i class="fas fa-circle-question footer-list-icon"></i>Why This</a></li>
+                    <li><a href="#features"><i class="fas fa-grid-2 footer-list-icon"></i>Features</a></li>
+                    <li><a href="#how"><i class="fas fa-gears footer-list-icon"></i>How It Works</a></li>
+                    <li><a href="#example"><i class="fas fa-chart-column footer-list-icon"></i>Sample Output</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h5>Outputs</h5>
                 <ul>
-                    <li><a href="#features">Career Matches</a></li>
-                    <li><a href="#features">Explainable Reasoning</a></li>
-                    <li><a href="#features">Skill Gaps</a></li>
-                    <li><a href="#features">Learning Roadmap</a></li>
+                    <li><a href="#features"><i class="fas fa-briefcase footer-list-icon"></i>Career Matches</a></li>
+                    <li><a href="#features"><i class="fas fa-magnifying-glass-chart footer-list-icon"></i>Explainable Reasoning</a></li>
+                    <li><a href="#features"><i class="fas fa-screwdriver-wrench footer-list-icon"></i>Skill Gaps</a></li>
+                    <li><a href="#features"><i class="fas fa-route footer-list-icon"></i>Learning Roadmap</a></li>
                 </ul>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 CareerAI. Skill-based career guidance system.</p>
-        </div>
+        <div class="footer-bottom"><p>&copy; 2026 CareerAI. Skill-based career guidance system.</p></div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

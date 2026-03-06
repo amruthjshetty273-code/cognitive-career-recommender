@@ -1,91 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerAI Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { --primary: #007bff; --bg: #f5f7fa; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .upload-section { background: white; padding: 40px; border-radius: 12px; text-align: center; }
-        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
-        .job-card { background: white; padding: 20px; border-radius: 12px; border-left: 5px solid var(--primary); }
-        .match-badge { font-weight: bold; color: var(--primary); font-size: 1.2rem; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header class="animate-slideDown">
-            <h1 class="gradient-text">Cognitive Career Advisor</h1>
-            <p>Upload your resume to see AI-driven job matches.</p>
-        </header>
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 20px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
 
-        <div class="upload-section animate-fadeInUp hover-glow">
-            <input type="file" id="resumeInput" hidden>
-            <button onclick="document.getElementById('resumeInput').click()" class="btn-morph">
-                Select Resume
-            </button>
-            <div id="loading" class="loading-dots" style="display:none; margin-top:10px;">Analyzing Skills</div>
-        </div>
+@keyframes pulseSoft {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.02);
+        opacity: 0.86;
+    }
+}
 
-        <div id="recommendations" class="results-grid">
-            </div>
-    </div>
+@keyframes shakeX {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-4px);
+    }
+    75% {
+        transform: translateX(4px);
+    }
+}
 
-    <script>
-        const resumeInput = document.getElementById('resumeInput');
-        
-        resumeInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
 
-            // Show loading state
-            document.getElementById('loading').style.display = 'block';
-            
-            const formData = new FormData();
-            formData.append('resume', file);
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+}
 
-            try {
-                // 1. Analyze Resume
-                await fetch('/api/upload', { method: 'POST', body: formData });
-                
-                // 2. Get Recommendations
-                const res = await fetch('/api/recommendations');
-                const jobs = await res.json();
-                
-                renderJobs(jobs);
-            } catch (err) {
-                console.error("Analysis failed", err);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-            }
-        });
+.animate-fadeInUp {
+    animation: fadeInUp 0.45s ease both;
+}
 
-        function renderJobs(jobs) {
-            const container = document.getElementById('recommendations');
-            container.innerHTML = '';
+.animate-pulse {
+    animation: pulseSoft 0.65s ease;
+}
 
-            jobs.forEach((job, index) => {
-                const card = document.createElement('div');
-                card.className = `job-card reveal hover-lift`;
-                card.style.transitionDelay = `${index * 0.1}s`;
-                
-                card.innerHTML = `
-                    <div class="match-badge">${job.match_score}% Match</div>
-                    <h3>${job.job_title}</h3>
-                    <p class="typewriter">${job.ai_insight.narrative}</p>
-                    <div class="status-tag">${job.ai_insight.status}</div>
-                    <canvas id="chart-${job.job_id}" width="200" height="200"></canvas>
-                `;
-                
-                container.appendChild(card);
-                // Trigger reveal animation
-                setTimeout(() => card.classList.add('active'), 100);
-            });
-        }
-    </script>
-</body>
-</html>
+.animate-shake {
+    animation: shakeX 0.35s ease;
+}
+
+.notification-slide-in {
+    animation: slideInRight 0.25s ease both;
+}
+
+.notification-slide-out {
+    animation: slideOutRight 0.22s ease both;
+}
