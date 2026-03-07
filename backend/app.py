@@ -315,11 +315,6 @@ def send_verification_email(email, verification_token, first_name, otp_code=None
                             </a>
                         </div>
                         
-                        <p style="color: #666; font-size: 13px;">Or copy this link into your browser:</p>
-                        <p style="background: white; padding: 12px; border-radius: 4px; word-break: break-all; font-size: 12px; color: #0066cc;">
-                            {verification_link}
-                        </p>
-                        
                         <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
                         
                         <p style="color: #666; font-size: 13px;">
@@ -340,11 +335,9 @@ def send_verification_email(email, verification_token, first_name, otp_code=None
         text_content = f"""
         Hello {first_name},
         
-        Thank you for creating an account with CareerAI! To get started with your personalized career recommendations, please verify your email address by clicking the link below or using this OTP code:
+        Thank you for creating an account with CareerAI! To get started with your personalized career recommendations, please verify your email address using the button in this email or the OTP code:
 
         OTP: {otp_code or ''}
-        
-        {verification_link}
         
         This verification link will expire in 1 hour. If you didn't create this account, you can safely ignore this email.
         
