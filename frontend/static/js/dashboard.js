@@ -34,6 +34,7 @@ const DashboardModule = {
         currentUser: null,
         lastProfile: null,
         lastSkills: [],
+        allRecommendationsRaw: [],
         allRecommendations: [],
         allLiveJobs: [],
         liveJobsSource: 'adzuna',
@@ -204,7 +205,7 @@ DashboardModule.setupQuickActionEvents = function() {
             return;
         }
 
-        this.loadLiveJobs(this.state.allRecommendations || [], effectiveProfile, effectiveSkills);
+        this.loadLiveJobs(this.state.allRecommendationsRaw || this.state.allRecommendations || [], effectiveProfile, effectiveSkills);
     });
     
     // Re-run Analysis button
@@ -260,7 +261,10 @@ DashboardModule.applyFilters = function() {
     };
     
     // Filter recommendations
-    let filtered = this.state.allRecommendations || [];
+    const baseRecommendations = (this.state.allRecommendationsRaw && this.state.allRecommendationsRaw.length)
+        ? this.state.allRecommendationsRaw
+        : (this.state.allRecommendations || []);
+    let filtered = baseRecommendations;
     
     if (this.state.currentFilters.experience) {
         filtered = filtered.filter(rec => {
@@ -304,10 +308,11 @@ DashboardModule.applyFilters = function() {
     }
     
     // Re-render with filtered results
-    this.renderRecommendations(filtered, this.state.lastSkills || []);
+    this.renderRecommendations(filtered, this.state.lastSkills || [], { persist: false, filtered: true });
 
     const filteredLiveJobs = this.filterLiveJobs(this.state.allLiveJobs || [], this.state.currentFilters);
     this.renderLiveJobs(filteredLiveJobs, this.state.liveJobsSource || 'adzuna', { persist: false, filtered: true });
+    this.updateFilterResultCount(filtered.length, baseRecommendations.length, filteredLiveJobs.length, (this.state.allLiveJobs || []).length);
     
     // Show filter indicator
     const hasActiveFilters = Object.values(this.state.currentFilters).some(v => v !== '' && v !== 0);
@@ -317,6 +322,18 @@ DashboardModule.applyFilters = function() {
     } else if (filterIndicator) {
         filterIndicator.style.borderLeft = 'none';
     }
+};
+
+DashboardModule.updateFilterResultCount = function(filteredMatches, totalMatches, filteredJobs, totalJobs) {
+    const counterEl = document.getElementById('filterResultCount');
+    if (!counterEl) return;
+
+    const safeFilteredMatches = Number.isFinite(filteredMatches) ? filteredMatches : 0;
+    const safeTotalMatches = Number.isFinite(totalMatches) ? totalMatches : 0;
+    const safeFilteredJobs = Number.isFinite(filteredJobs) ? filteredJobs : 0;
+    const safeTotalJobs = Number.isFinite(totalJobs) ? totalJobs : 0;
+
+    counterEl.textContent = `Matches: ${safeFilteredMatches}/${safeTotalMatches} | Live jobs: ${safeFilteredJobs}/${safeTotalJobs}`;
 };
 
 DashboardModule.normalizeExperienceLevel = function(value) {
@@ -595,6 +612,7 @@ DashboardModule.resetAnalysisOutputs = function() {
     });
 
     this.state.allRecommendations = [];
+    this.state.allRecommendationsRaw = [];
     this.state.allLiveJobs = [];
     this.state.liveJobsSource = 'adzuna';
 
@@ -643,6 +661,7 @@ DashboardModule.clearSavedProfile = function() {
             this.state.lastProfile = null;
             this.state.lastSkills = [];
             this.state.allRecommendations = [];
+            this.state.allRecommendationsRaw = [];
             this.state.hasSessionInput = false;
             this.setProfileStatus('Saved profile cleared.');
             this.updateProfileCompletion({});
@@ -1119,38 +1138,46 @@ DashboardModule.updateDataSourceTimestamp = function() {
     }
 };
 
-DashboardModule.renderRecommendations = function(recommendations, userSkills) {
+DashboardModule.renderRecommendations = function(recommendations, userSkills, options = {}) {
     const list = document.getElementById('recommendationsList');
     const empty = document.getElementById('recommendationsEmpty');
+    const isFilteredView = options.filtered === true;
+    const shouldPersist = options.persist !== false;
 
     if (!list || !empty) return;
 
     const skillsLower = userSkills.map(skill => skill.toLowerCase());
     const aggregatedMissing = new Set();
 
-    // Show only roles with a positive real overlap score.
-    const suitableRecs = recommendations.filter(rec => {
-        const score = typeof rec.match_score === 'number' 
-            ? (rec.match_score <= 1 ? rec.match_score * 100 : rec.match_score)
-            : 0;
-        const matchedCount = Array.isArray(rec.matched_skills) ? rec.matched_skills.length : 0;
-        return score >= 40 && matchedCount >= 2;
-    });
+    let allRecs = [];
 
-    let allRecs = suitableRecs.slice(0, 6);
-
-    if (!allRecs.length) {
-        const lowConfidence = recommendations.filter(rec => {
+    if (isFilteredView) {
+        allRecs = Array.isArray(recommendations) ? recommendations.slice(0, 6) : [];
+    } else {
+        // Show only roles with a positive real overlap score.
+        const suitableRecs = recommendations.filter(rec => {
             const score = typeof rec.match_score === 'number'
                 ? (rec.match_score <= 1 ? rec.match_score * 100 : rec.match_score)
                 : 0;
             const matchedCount = Array.isArray(rec.matched_skills) ? rec.matched_skills.length : 0;
-            return score >= 25 && matchedCount >= 1;
+            return score >= 40 && matchedCount >= 2;
         });
 
-        if (lowConfidence.length) {
-            allRecs = lowConfidence.slice(0, 4);
-            this.showAlert('info', 'Showing low-confidence matches. Add more skills for stronger recommendations.');
+        allRecs = suitableRecs.slice(0, 6);
+
+        if (!allRecs.length) {
+            const lowConfidence = recommendations.filter(rec => {
+                const score = typeof rec.match_score === 'number'
+                    ? (rec.match_score <= 1 ? rec.match_score * 100 : rec.match_score)
+                    : 0;
+                const matchedCount = Array.isArray(rec.matched_skills) ? rec.matched_skills.length : 0;
+                return score >= 25 && matchedCount >= 1;
+            });
+
+            if (lowConfidence.length) {
+                allRecs = lowConfidence.slice(0, 4);
+                this.showAlert('info', 'Showing low-confidence matches. Add more skills for stronger recommendations.');
+            }
         }
     }
 
@@ -1160,18 +1187,23 @@ DashboardModule.renderRecommendations = function(recommendations, userSkills) {
 
         const emptyTitle = empty.querySelector('h6');
         const emptyText = empty.querySelector('p');
-        if (emptyTitle) emptyTitle.textContent = 'No Skill-Based Matches Yet';
+        if (emptyTitle) emptyTitle.textContent = isFilteredView ? 'No Matches For Current Filters' : 'No Skill-Based Matches Yet';
         if (emptyText) {
-            emptyText.textContent = 'No career reached a positive overlap score. Add relevant skills and run analysis again.';
+            emptyText.textContent = isFilteredView
+                ? 'Try broader filter settings to see more matching roles.'
+                : 'No career reached a positive overlap score. Add relevant skills and run analysis again.';
         }
 
-        this.state.allRecommendations = [];
+        if (shouldPersist) {
+            this.state.allRecommendations = [];
+            this.state.allRecommendationsRaw = [];
+        }
 
         const filterPanel = document.getElementById('filterPanel');
-        if (filterPanel) filterPanel.classList.add('d-none');
+        if (filterPanel && !isFilteredView) filterPanel.classList.add('d-none');
 
         const rerunBtn = document.getElementById('rerunAnalysisBtn');
-        if (rerunBtn) rerunBtn.style.display = 'none';
+        if (rerunBtn && !isFilteredView) rerunBtn.style.display = 'none';
 
         return;
     }
@@ -1249,7 +1281,10 @@ DashboardModule.renderRecommendations = function(recommendations, userSkills) {
     list.classList.remove('d-none');
     empty.classList.add('d-none');
     
-    // Store all recommendations for filtering
+    // Store full source for future filter operations.
+    if (shouldPersist) {
+        this.state.allRecommendationsRaw = allRecs.slice();
+    }
     this.state.allRecommendations = allRecs;
     
     // Show filter panel now that we have results
