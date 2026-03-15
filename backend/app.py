@@ -165,6 +165,15 @@ def _init_feedback_db():
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS password_reset_tokens (
+                token TEXT PRIMARY KEY,
+                email TEXT NOT NULL,
+                expires_at TEXT NOT NULL
+            )
+            """
+        )
 
 
 def _save_feedback(user_id, role, feedback):
@@ -214,6 +223,125 @@ def _delete_feedback(user_id, feedback_id):
             return True
     except Exception as e:
         logger.error(f"Error deleting feedback: {e}")
+        return False
+
+
+def _save_reset_token(email, token, expiry_minutes=60):
+    expires_at = (datetime.now(timezone.utc) + timedelta(minutes=expiry_minutes)).isoformat()
+    with sqlite3.connect(FEEDBACK_DB) as conn:
+        conn.execute("DELETE FROM password_reset_tokens WHERE email = ?", (email,))
+        conn.execute(
+            "INSERT INTO password_reset_tokens (token, email, expires_at) VALUES (?, ?, ?)",
+            (token, email, expires_at)
+        )
+
+
+def _verify_reset_token(token):
+    """Returns (email, None) if valid, (None, error_message) if not."""
+    with sqlite3.connect(FEEDBACK_DB) as conn:
+        cursor = conn.execute(
+            "SELECT email, expires_at FROM password_reset_tokens WHERE token = ?",
+            (token,)
+        )
+        row = cursor.fetchone()
+
+    if not row:
+        return None, 'Invalid or already used reset link.'
+
+    email, expires_at_raw = row
+    try:
+        expires_at = datetime.fromisoformat(expires_at_raw)
+    except ValueError:
+        return None, 'Invalid reset token.'
+
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+    if datetime.now(timezone.utc) > expires_at:
+        return None, 'Reset link has expired. Please request a new one.'
+
+    return email, None
+
+
+def _delete_reset_token(token):
+    with sqlite3.connect(FEEDBACK_DB) as conn:
+        conn.execute("DELETE FROM password_reset_tokens WHERE token = ?", (token,))
+
+
+def send_reset_email(email, reset_token, first_name):
+    """Send password reset link to user."""
+    try:
+        mail_username = app.config.get('MAIL_USERNAME')
+        mail_password = app.config.get('MAIL_PASSWORD')
+
+        if not mail_username or not mail_password or mail_username == 'your-email@gmail.com':
+            logger.warning(f"Email not configured. Cannot send reset email to {email}.")
+            return False
+
+        reset_link = url_for('reset_password', token=reset_token, _external=True)
+
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = 'Reset Your Password - CareerAI'
+        msg['From'] = app.config.get('MAIL_DEFAULT_SENDER')
+        msg['To'] = email
+
+        html_content = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #1b3a6b, #275395); color: white; padding: 30px; border-radius: 8px 8px 0 0; text-align: center;">
+                        <h1 style="margin: 0; font-size: 28px;">CareerAI</h1>
+                        <p style="margin: 5px 0 0 0; font-size: 14px;">Password Reset Request</p>
+                    </div>
+                    <div style="padding: 30px; background: #f5f7fa; border-radius: 0 0 8px 8px;">
+                        <h2 style="color: #1b3a6b; margin-top: 0;">Hello {first_name},</h2>
+                        <p>We received a request to reset your CareerAI account password. Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="{reset_link}" style="display: inline-block; background: linear-gradient(135deg, #1b3a6b, #275395); color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                                Reset Password
+                            </a>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                        <p style="color: #666; font-size: 13px;">
+                            If you didn't request a password reset, you can safely ignore this email — your password will not be changed.
+                        </p>
+                        <p style="color: #999; font-size: 12px; margin-top: 20px;">
+                            Best regards,<br><strong>CareerAI Team</strong>
+                        </p>
+                    </div>
+                </div>
+            </body>
+        </html>
+        """
+
+        text_content = f"""
+Hello {first_name},
+
+We received a request to reset your CareerAI password.
+Use the link below to set a new password (expires in 1 hour):
+
+{reset_link}
+
+If you didn't request this, ignore this email.
+
+CareerAI Team
+        """
+
+        msg.attach(MIMEText(text_content, 'plain'))
+        msg.attach(MIMEText(html_content, 'html'))
+
+        server = smtplib.SMTP(app.config.get('MAIL_SERVER'), app.config.get('MAIL_PORT'))
+        server.starttls()
+        server.login(mail_username, mail_password)
+        server.send_message(msg)
+        server.quit()
+        logger.info(f"Password reset email sent to {email}")
+        return True
+    except smtplib.SMTPAuthenticationError:
+        logger.error("SMTP authentication failed sending reset email.")
+        return False
+    except Exception as e:
+        logger.error(f"Error sending reset email to {email}: {e}")
         return False
 
 
@@ -372,6 +500,45 @@ def send_verification_email(email, verification_token, first_name, otp_code=None
     except Exception as e:
         logger.error(f"Error sending verification email to {email}: {e}")
         return False
+
+
+def _prepare_verification_notice(user, flow='verification_required'):
+    """Create a fresh verification challenge and return the notice URL."""
+    verification_token = secrets.token_urlsafe(32)
+    user.email_verification_token = verification_token
+    db.session.commit()
+
+    first_name = (user.name or '').split(' ')[0] if user.name else ''
+    verification_url = url_for('verify_email', token=verification_token, _external=True)
+    otp_code = _generate_email_otp()
+    _save_email_otp(user.email, otp_code)
+
+    mail_username = (app.config.get('MAIL_USERNAME') or '').strip()
+    mail_password = (app.config.get('MAIL_PASSWORD') or '').strip()
+    mail_configured = bool(mail_username and mail_password and mail_username != 'your-email@gmail.com')
+
+    mail_sent = False
+    mail_status = 'not_configured'
+    if mail_configured:
+        mail_sent = send_verification_email(user.email, verification_token, first_name, otp_code)
+        mail_status = 'sent' if mail_sent else 'delivery_failed'
+        if not mail_sent:
+            logger.warning(f"EMAIL DELIVERY FAILED - Verification URL: {verification_url}")
+    else:
+        logger.warning(f"EMAIL NOT CONFIGURED - Verification URL: {verification_url}")
+
+    notice_args = {
+        'success': 1,
+        'email': user.email,
+        'mail_sent': 1 if mail_sent else 0,
+        'mail_status': mail_status,
+        'flow': flow,
+    }
+    if not mail_sent and app.config.get('DEBUG'):
+        notice_args['verification_url'] = verification_url
+        notice_args['otp_hint'] = otp_code
+
+    return url_for('verify_email_notice', **notice_args), mail_sent
 
 # Initialize AI components with error handling
 try:
@@ -670,12 +837,10 @@ def index():
 def login():
     """Handle user login"""
     if request.method == 'POST':
-        session.clear()  # Always clear session on login attempt
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
 
         if not email or not password:
-            flash('Email and password are required', 'error')
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({
                     'success': False,
@@ -686,32 +851,47 @@ def login():
         user = User.query.filter_by(email=email).first()
         now = datetime.now(timezone.utc)
 
-        # Account lockout logic
         if user:
-            # Check if account is locked
-            if user.lockout_until and user.lockout_until > now:
-                session.clear()
-                remaining = int((user.lockout_until - now).total_seconds() // 60) + 1
+            # Check if account is locked — lockout_until stored as naive datetime in SQLAlchemy;
+            # normalise to UTC-aware before comparing with timezone.utc aware `now`.
+            lockout_ts = user.lockout_until
+            if lockout_ts is not None and lockout_ts.tzinfo is None:
+                lockout_ts = lockout_ts.replace(tzinfo=timezone.utc)
+            if lockout_ts and lockout_ts > now:
+                remaining = int((lockout_ts - now).total_seconds() // 60) + 1
                 return jsonify({
                     'success': False,
                     'message': f'Account locked due to too many failed attempts. Try again in {remaining} minutes.'
                 }), 403
+
             if user.verify_password(password):
                 if not user.email_verified:
-                    session.clear()
+                    notice_url, mail_sent = _prepare_verification_notice(user, flow='login_verification')
+                    message = (
+                        'Please verify your email before logging in. We sent a fresh verification email and OTP.'
+                        if mail_sent
+                        else 'Please verify your email before logging in. Use the verification page to resend or verify with OTP.'
+                    )
                     return jsonify({
                         'success': False,
-                        'message': 'Please verify your email before logging in. Check your email for verification link.'
+                        'message': message,
+                        'redirect_url': notice_url,
+                        'requires_verification': True,
                     }), 403
-                # Reset failed attempts on successful login
+
+                # Successful login — rotate session to prevent fixation
                 user.failed_login_attempts = 0
                 user.lockout_until = None
                 from models import db
                 db.session.commit()
+                # Keep CSRF token alive across session rotation
+                csrf_token = session.get('csrf_token')
+                session.clear()
+                if csrf_token:
+                    session['csrf_token'] = csrf_token
                 session['user_id'] = user.email
                 session['user_name'] = user.name
                 session.permanent = True
-                flash('Login successful!', 'success')
                 return jsonify({
                     'success': True,
                     'redirect_url': '/dashboard',
@@ -724,8 +904,7 @@ def login():
                     user.lockout_until = now + timedelta(minutes=15)
                 from models import db
                 db.session.commit()
-        session.clear()  # Always clear session on failed login
-        flash('Invalid email or password', 'error')
+
         return jsonify({
             'success': False,
             'message': 'Invalid email or password'
@@ -779,13 +958,34 @@ def register():
             errors.extend(password_errors)
         if password != confirm_password:
             errors.append('Passwords do not match')
-        if User.query.filter_by(email=email).first():
-            errors.append('Email is already registered')
         if errors:
             if is_ajax:
                 return jsonify({'success': False, 'errors': errors}), 400
             else:
                 return render_template('auth/register.html', errors=errors)
+
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            if existing_user.email_verified:
+                if is_ajax:
+                    return jsonify({'success': False, 'errors': ['Email is already registered']}), 400
+                return render_template('auth/register.html', errors=['Email is already registered'])
+
+            notice_url, mail_sent = _prepare_verification_notice(existing_user, flow='existing_account')
+            message = (
+                'This email is already registered but not verified. We sent a fresh verification email and OTP.'
+                if mail_sent
+                else 'This email is already registered but not verified. Use the verification page to resend or verify with OTP.'
+            )
+            flash(message, 'info')
+            if is_ajax:
+                return jsonify({
+                    'success': False,
+                    'message': message,
+                    'redirect_url': notice_url,
+                    'requires_verification': True,
+                }), 409
+            return redirect(notice_url)
 
         # Register user (email_verified=False, token generated)
         user, err, verification_token = AuthService.register(f"{first_name} {last_name}", email, password)
@@ -865,10 +1065,9 @@ def verify_email(token):
         user.email_verification_token = None
         db.session.commit()
         _delete_email_otp(user.email)
-        flash('Email verified successfully! Please complete your profile.', 'success')
+        flash('Email verified successfully. Welcome to your dashboard.', 'success')
         session['user_id'] = user.email
-        # Redirect to profile setup page after verification
-        return redirect(url_for('profile'))
+        return redirect(url_for('dashboard'))
     flash('Invalid or expired verification link.', 'error')
     return redirect(url_for('index'))
 
@@ -897,9 +1096,9 @@ def verify_email_code():
     user.email_verification_token = None
     db.session.commit()
 
-    flash('Email verified successfully using OTP! Please complete your profile.', 'success')
+    flash('Email verified successfully using OTP. Welcome to your dashboard.', 'success')
     session['user_id'] = user.email
-    return redirect(url_for('profile'))
+    return redirect(url_for('dashboard'))
 # Profile setup route
 def db_login_required(f):
     @wraps(f)
@@ -929,22 +1128,94 @@ def profile():
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    """Handle forgot password requests"""
+    """Send a real password reset email."""
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
 
-        user_exists = User.query.filter_by(email=email).first() is not None
-        if user_exists:
-            # In a real app, you would send a reset email here.
-            logger.info(f"Password reset requested for {email}")
+        if not email or '@' not in email:
+            return jsonify({'success': False, 'message': 'Please enter a valid email address.'}), 400
 
-        flash('If this email is registered, password reset instructions have been sent.', 'info')
-        return jsonify({
-            'success': True,
-            'message': 'If this email is registered, password reset instructions have been sent.'
-        })
-    
+        user = User.query.filter_by(email=email).first()
+
+        # Always return the same message to avoid email enumeration
+        generic_msg = 'If this email is registered, a password reset link has been sent. Please check your inbox.'
+
+        if user and user.email_verified:
+            reset_token = secrets.token_urlsafe(32)
+            _save_reset_token(email, reset_token, expiry_minutes=60)
+            first_name = (user.name or '').split(' ')[0] if user.name else 'there'
+            sent = send_reset_email(email, reset_token, first_name)
+            if not sent:
+                logger.warning(f"Password reset email delivery failed for {email}")
+
+        return jsonify({'success': True, 'message': generic_msg})
+
     return render_template('auth/forgot_password.html')
+
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    """Verify reset token and allow user to set a new password."""
+    if request.method == 'POST':
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        password = request.form.get('password', '')
+        confirm = request.form.get('confirm_password', '')
+
+        email, token_error = _verify_reset_token(token)
+        if token_error:
+            if is_ajax:
+                return jsonify({'success': False, 'message': token_error}), 400
+            flash(token_error, 'error')
+            return redirect(url_for('forgot_password'))
+
+        if not password or not confirm:
+            msg = 'Both password fields are required.'
+            if is_ajax:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'error')
+            return render_template('auth/reset_password.html', token=token)
+
+        if password != confirm:
+            msg = 'Passwords do not match.'
+            if is_ajax:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'error')
+            return render_template('auth/reset_password.html', token=token)
+
+        pw_errors = validate_password_strength(password)
+        if pw_errors:
+            msg = pw_errors[0]
+            if is_ajax:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'error')
+            return render_template('auth/reset_password.html', token=token)
+
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            msg = 'Account not found.'
+            if is_ajax:
+                return jsonify({'success': False, 'message': msg}), 404
+            flash(msg, 'error')
+            return redirect(url_for('login'))
+
+        user.set_password(password)
+        user.failed_login_attempts = 0
+        user.lockout_until = None
+        db.session.commit()
+        _delete_reset_token(token)
+
+        if is_ajax:
+            return jsonify({'success': True, 'redirect_url': '/login', 'message': 'Password reset successfully. You can now log in.'})
+        flash('Password reset successfully. You can now log in with your new password.', 'success')
+        return redirect(url_for('login'))
+
+    # GET — validate token before showing form
+    email, token_error = _verify_reset_token(token)
+    if token_error:
+        flash(token_error, 'error')
+        return redirect(url_for('forgot_password'))
+
+    return render_template('auth/reset_password.html', token=token)
 
 @app.route('/dashboard')
 @db_login_required

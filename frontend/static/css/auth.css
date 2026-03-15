@@ -282,9 +282,41 @@ html[data-bs-theme='dark'] .form-check-label {
     border-color: #d6dbe5 !important;
 }
 
+.verification-help-panel {
+    border: 1px solid #d9e7f4;
+    border-radius: 12px;
+    padding: 12px;
+    background: #f7fbff;
+}
+
+.verification-help-title {
+    font-weight: 700;
+    color: #1b4d81;
+    margin-bottom: 6px;
+}
+
+.verification-help-copy {
+    color: #58708c;
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
 html[data-bs-theme='dark'] .password-rules-panel {
     background: #111827;
     border-color: #334155 !important;
+}
+
+html[data-bs-theme='dark'] .verification-help-panel {
+    background: #0d1a2d;
+    border-color: #274261;
+}
+
+html[data-bs-theme='dark'] .verification-help-title {
+    color: #c9e2ff;
+}
+
+html[data-bs-theme='dark'] .verification-help-copy {
+    color: #9fb6cf;
 }
 
 .verify-wrap {

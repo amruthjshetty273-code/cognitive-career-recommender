@@ -1,136 +1,44 @@
 {% extends "layout/base.html" %}
 
-{% block title %}User Persona - CareerAI{% endblock %}
-
-{% block extra_css %}
-<style>
-.persona-grid {
-  display: grid;
-  grid-template-columns: 1fr 2fr 2fr;
-  grid-template-rows: auto auto 1fr 1fr;
-  gap: 1rem;
-  min-height: 80vh;
-}
-@media (max-width: 900px) {
-  .persona-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-  }
-}
-.persona-photo {
-  grid-row: 1 / span 2;
-  grid-column: 1 / 2;
-  background: #f8f9fa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  border: 1px solid #ccc;
-  min-height: 200px;
-}
-.persona-quote {
-  grid-row: 3 / 4;
-  grid-column: 1 / 2;
-  background: #f8f9fa;
-  border: 1px solid #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-style: italic;
-  min-height: 80px;
-}
-.persona-about, .persona-about-name {
-  border: 1px solid #ccc;
-  background: #fff;
-  padding: 1rem;
-}
-.persona-about {
-  grid-row: 1 / 2;
-  grid-column: 2 / 3;
-}
-.persona-about-name {
-  grid-row: 2 / 3;
-  grid-column: 2 / 3;
-}
-.persona-frustration, .persona-goals, .persona-needs, .persona-expectations {
-  border: 1px solid #ccc;
-  background: #fff;
-  padding: 1rem;
-  min-height: 80px;
-}
-.persona-frustration { grid-row: 3 / 4; grid-column: 2 / 3; }
-.persona-goals { grid-row: 3 / 4; grid-column: 3 / 4; }
-.persona-needs { grid-row: 4 / 5; grid-column: 2 / 3; }
-.persona-expectations { grid-row: 4 / 5; grid-column: 3 / 4; }
-.persona-scenario { border: 1px solid #ccc; background: #fff; padding: 1rem; margin-bottom: 1rem; }
-@media (max-width: 900px) {
-  .persona-photo, .persona-quote, .persona-about, .persona-about-name, .persona-frustration, .persona-goals, .persona-needs, .persona-expectations {
-    grid-column: 1 / 2 !important;
-    grid-row: auto !important;
-  }
-}
-</style>
-{% endblock %}
+{% block title %}Account Profile - CareerAI{% endblock %}
 
 {% block content %}
 <div class="container py-4">
-  <div class="persona-grid">
-    <div class="persona-photo">
-      photo
-    </div>
-    <div class="persona-about">
-      <strong>About</strong><br>
-      Age<br>
-      Education<br>
-      occupation<br>
-      status<br>
-      location
-    </div>
-    <div class="persona-scenario" style="grid-row: 1 / 3; grid-column: 3 / 4;">
-      <strong>Scenario 1</strong><br>
-      <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...</span>
-      <div class="mt-2"><strong>Task</strong>
-        <ol>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-        </ol>
-      </div>
-    </div>
-    <div class="persona-about-name">
-      <strong>About &lt;Name&gt;</strong><br>
-      Add a background description about the person
-    </div>
-    <div class="persona-frustration">
-      <strong>Frustration</strong><br>one
-    </div>
-    <div class="persona-goals">
-      <strong>Goals</strong><br>one
-    </div>
-    <div class="persona-quote">
-      <strong>Personal quote</strong>
-    </div>
-    <div class="persona-needs">
-      <strong>Needs</strong><br>one
-    </div>
-    <div class="persona-expectations">
-      <strong>Expectations</strong><br>one
-    </div>
-    <div class="persona-scenario" style="grid-row: 3 / 5; grid-column: 3 / 4;">
-      <strong>Scenario 2</strong><br>
-      <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...</span>
-      <div class="mt-2"><strong>Task</strong>
-        <ol>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-          <li>enim ad minima veniam</li>
-        </ol>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4 p-md-5">
+          <h2 class="h4 mb-3">Account Profile</h2>
+          <p class="text-muted mb-4">This page shows your verified account details. Continue to dashboard for career analysis.</p>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label text-muted">Name</label>
+              <input class="form-control" type="text" value="{{ user.name if user else '' }}" readonly>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Email</label>
+              <input class="form-control" type="email" value="{{ user.email if user else '' }}" readonly>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Verification Status</label>
+              <input class="form-control" type="text" value="{{ 'Verified' if user and user.email_verified else 'Pending' }}" readonly>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Role</label>
+              <input class="form-control" type="text" value="{{ user.role if user else 'user' }}" readonly>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <a href="/dashboard" class="btn btn-primary">
+              <i class="fas fa-gauge-high me-2"></i>Go to Dashboard
+            </a>
+            <a href="/logout" class="btn btn-outline-secondary">
+              <i class="fas fa-right-from-bracket me-2"></i>Logout
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -8,6 +8,7 @@
 {% block auth_content %}
 <div class="verify-wrap">
     {% set mail_status = request.args.get('mail_status', 'not_configured') %}
+    {% set flow = request.args.get('flow', '') %}
     {% if request.args.get('success') == '1' %}
     <div class="alert {{ 'alert-success' if request.args.get('mail_sent') == '1' else 'alert-warning' }} alert-dismissible fade show verify-alert" role="alert">
         <i class="fas {{ 'fa-check-circle' if request.args.get('mail_sent') == '1' else 'fa-triangle-exclamation' }} me-2"></i>
@@ -47,6 +48,22 @@
 
     {% if request.args.get('email') %}
     <p class="verify-email-target">Verification email for: <strong>{{ request.args.get('email') }}</strong></p>
+    {% endif %}
+
+    {% if flow == 'existing_account' %}
+    <div class="verify-panel">
+        <p class="verify-panel-title">Account already exists</p>
+        <p class="verify-description mb-0">
+            Your account is already created, but email verification is still pending. Finish verification here instead of creating a new account.
+        </p>
+    </div>
+    {% elif flow == 'login_verification' %}
+    <div class="verify-panel">
+        <p class="verify-panel-title">Login blocked until verification</p>
+        <p class="verify-description mb-0">
+            For security, login is available only after email verification. Use the latest email link or the OTP below.
+        </p>
+    </div>
     {% endif %}
 
     <div class="verify-panel">

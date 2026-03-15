@@ -310,9 +310,11 @@ DashboardModule.applyFilters = function() {
     // Re-render with filtered results
     this.renderRecommendations(filtered, this.state.lastSkills || [], { persist: false, filtered: true });
 
+    const totalLiveJobs = (this.state.allLiveJobs || []).length;
+    const liveSource = this.state.liveJobsSource || 'adzuna';
     const filteredLiveJobs = this.filterLiveJobs(this.state.allLiveJobs || [], this.state.currentFilters);
-    this.renderLiveJobs(filteredLiveJobs, this.state.liveJobsSource || 'adzuna', { persist: false, filtered: true });
-    this.updateFilterResultCount(filtered.length, baseRecommendations.length, filteredLiveJobs.length, (this.state.allLiveJobs || []).length);
+    this.renderLiveJobs(filteredLiveJobs, liveSource, { persist: false, filtered: totalLiveJobs > 0 });
+    this.updateFilterResultCount(filtered.length, baseRecommendations.length, filteredLiveJobs.length, totalLiveJobs, liveSource);
     
     // Show filter indicator
     const hasActiveFilters = Object.values(this.state.currentFilters).some(v => v !== '' && v !== 0);
@@ -324,7 +326,7 @@ DashboardModule.applyFilters = function() {
     }
 };
 
-DashboardModule.updateFilterResultCount = function(filteredMatches, totalMatches, filteredJobs, totalJobs) {
+DashboardModule.updateFilterResultCount = function(filteredMatches, totalMatches, filteredJobs, totalJobs, liveSource = 'adzuna') {
     const counterEl = document.getElementById('filterResultCount');
     if (!counterEl) return;
 
@@ -332,6 +334,11 @@ DashboardModule.updateFilterResultCount = function(filteredMatches, totalMatches
     const safeTotalMatches = Number.isFinite(totalMatches) ? totalMatches : 0;
     const safeFilteredJobs = Number.isFinite(filteredJobs) ? filteredJobs : 0;
     const safeTotalJobs = Number.isFinite(totalJobs) ? totalJobs : 0;
+
+    if (safeTotalJobs === 0 && String(liveSource || '').toLowerCase() !== 'adzuna') {
+        counterEl.textContent = `Matches: ${safeFilteredMatches}/${safeTotalMatches} | Live jobs: unavailable`;
+        return;
+    }
 
     counterEl.textContent = `Matches: ${safeFilteredMatches}/${safeTotalMatches} | Live jobs: ${safeFilteredJobs}/${safeTotalJobs}`;
 };
@@ -930,6 +937,16 @@ DashboardModule.submitProfileForAnalysis = function(profilePayload, userSkills) 
                 this.renderLiveJobs(data.live_jobs, data.data_source || 'adzuna');
                 this.applyFilters();
             } else {
+                if (data.data_source && data.data_source !== 'adzuna') {
+                    this.resetLiveJobsPanel({
+                        marketTitle: 'Live Market Snapshot',
+                        marketSubtitle: 'Live job data unavailable. Please refresh or try again later.',
+                        title: 'Live Jobs Unavailable',
+                        subtitle: 'Live API jobs are temporarily unavailable. Career recommendations are generated from local role catalog data.'
+                    });
+                    this.applyFilters();
+                    return;
+                }
                 // Fallback fetch using matched careers context.
                 this.loadLiveJobs(data.recommendations, profilePayload, userSkills);
             }
@@ -1034,9 +1051,16 @@ DashboardModule.renderLiveJobs = function(jobs, source = 'adzuna', options = {})
     }
 
     if (!Array.isArray(jobs) || !jobs.length) {
+        const sourceUnavailable = sourceValue !== 'adzuna';
+        const isFilteredView = options.filtered === true && !sourceUnavailable;
+
         this.resetLiveJobsPanel({
-            title: options.filtered ? 'No Jobs Match Current Filters' : 'Live Jobs Unavailable',
-            subtitle: options.filtered
+            marketTitle: 'Live Market Snapshot',
+            marketSubtitle: sourceUnavailable
+                ? 'Live job data unavailable. Please refresh or try again later.'
+                : 'Real-time job opportunities powered by Adzuna API.',
+            title: isFilteredView ? 'No Jobs Match Current Filters' : 'Live Jobs Unavailable',
+            subtitle: isFilteredView
                 ? 'Try broader location, experience, or salary filters.'
                 : 'Live job data unavailable. Please refresh or try again later.'
         });

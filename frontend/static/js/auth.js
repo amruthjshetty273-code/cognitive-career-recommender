@@ -51,6 +51,11 @@ AuthModule.setupEventListeners = function() {
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => this.handleLogin(e));
 
+        const resendBtn = document.getElementById('resendVerificationBtn');
+        if (resendBtn) {
+            resendBtn.addEventListener('click', () => this.handleResendVerificationFromLogin());
+        }
+
         // Clear login errors as soon as user starts correcting input.
         loginForm.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', () => this.clearInlineAlerts());
@@ -434,8 +439,12 @@ AuthModule.submitForm = async function(url, formData) {
         
         // Check if response is successful
         if (!response.ok) {
+            const redirectUrl = data.redirect_url || null;
+
             if (Array.isArray(data.errors) && data.errors.length) {
-                throw new Error(data.errors.join(' '));
+                const error = new Error(data.errors.join(' '));
+                if (redirectUrl) error.redirectUrl = redirectUrl;
+                throw error;
             }
 
             if (data.errors && typeof data.errors === 'object') {
@@ -444,11 +453,20 @@ AuthModule.submitForm = async function(url, formData) {
                     .filter(Boolean)
                     .map(String);
                 if (flattened.length) {
-                    throw new Error(flattened.join(' '));
+                    const error = new Error(flattened.join(' '));
+                    if (redirectUrl) error.redirectUrl = redirectUrl;
+                    throw error;
                 }
             }
 
-            throw new Error(data.message || data.error || 'Request failed');
+            const error = new Error(data.message || data.error || 'Request failed');
+            if (redirectUrl) error.redirectUrl = redirectUrl;
+            if (data.requires_verification) {
+                error.requiresVerification = true;
+                const panel = document.getElementById('verificationHelpPanel');
+                if (panel) panel.classList.remove('d-none');
+            }
+            throw error;
         }
         
         return data;
@@ -489,6 +507,13 @@ AuthModule.handleLogin = function(e) {
             }
         })
         .catch(error => {
+            if (error.redirectUrl) {
+                this.showAlert('warning', error.message || 'Verification required. Redirecting...');
+                setTimeout(() => {
+                    window.location.href = error.redirectUrl;
+                }, 900);
+                return;
+            }
             this.showAlert('error', error.message || 'Login failed. Please try again.');
         })
         .finally(() => {
@@ -544,6 +569,13 @@ AuthModule.handleRegistration = function(e) {
             }
         })
         .catch(error => {
+            if (error.redirectUrl) {
+                this.showAlert('info', error.message || 'Verification required. Redirecting...');
+                setTimeout(() => {
+                    window.location.href = error.redirectUrl;
+                }, 900);
+                return;
+            }
             this.showAlert('error', error.message || 'Registration failed. Please try again.');
         })
         .finally(() => {
@@ -579,6 +611,37 @@ AuthModule.handleForgotPassword = function(e) {
         .finally(() => {
             this.setSubmissionState(false);
         });
+};
+
+AuthModule.handleResendVerificationFromLogin = function() {
+    const emailField = document.getElementById('email');
+    const email = (emailField?.value || '').trim().toLowerCase();
+    const csrfToken = this.getCsrfToken();
+
+    if (!email || !this.config.emailRegex.test(email)) {
+        this.showAlert('warning', 'Enter a valid email first, then click resend verification.');
+        if (emailField) emailField.focus();
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/resend-verification';
+
+    const emailInput = document.createElement('input');
+    emailInput.type = 'hidden';
+    emailInput.name = 'email';
+    emailInput.value = email;
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = csrfToken;
+
+    form.appendChild(emailInput);
+    form.appendChild(csrfInput);
+    document.body.appendChild(form);
+    form.submit();
 };
 
 /**
@@ -709,8 +772,7 @@ AuthModule.showAlert = function(type, message) {
 
     alertContainer.insertAdjacentHTML('afterbegin', alertHTML);
 
-    // Fade out quickly for auth errors to reduce noise.
-    const removeDelay = type === 'error' ? 3000 : 5000;
+    const removeDelay = 5000;
     setTimeout(() => {
         const alertElem = document.getElementById(alertId);
         if (alertElem) {
