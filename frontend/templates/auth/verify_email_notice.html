@@ -84,6 +84,7 @@
 
     <div class="verify-help-text">Didn't receive the email? Check your spam or junk folder.</div>
     <form method="POST" action="/resend-verification" class="resend-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="email" value="{{ request.args.get('email', '') }}">
         <button type="submit" class="btn btn-link p-0">Resend verification email</button>
     </form>

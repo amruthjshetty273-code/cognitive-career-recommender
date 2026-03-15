@@ -9,7 +9,6 @@ from flask_wtf.csrf import CSRFProtect, generate_csrf, CSRFError
 from werkzeug.utils import secure_filename
 import os
 import sys
-import bcrypt
 import secrets
 import sqlite3
 import logging
@@ -411,35 +410,6 @@ except Exception as e:
 
 _init_feedback_db()
 
-# In-memory user storage (replace with database in production)
-users_db = {
-    'admin@example.com': {
-        'password_hash': bcrypt.hashpw('admin123'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
-        'first_name': 'Admin',
-        'last_name': 'User',
-        'email': 'admin@example.com'
-    }
-}
-
-def hash_password(password):
-    """Hash password using bcrypt with automatic salting"""
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-def verify_password(password, password_hash):
-    """Verify password against hash - FIXED: bcrypt.checkpw expects bytes"""
-    try:
-        # Convert password to bytes
-        password_bytes = password.encode('utf-8')
-        # password_hash might be str or bytes - convert to bytes if needed
-        if isinstance(password_hash, str):
-            password_hash_bytes = password_hash.encode('utf-8')
-        else:
-            password_hash_bytes = password_hash
-        return bcrypt.checkpw(password_bytes, password_hash_bytes)
-    except (ValueError, TypeError) as e:
-        logger.error(f"Password verification error: {e}")
-        return False
-
 
 def _build_structured_profile(resume_data):
     """Normalize resume analyzer output into a simple structured profile"""
@@ -675,13 +645,16 @@ def login_required(f):
         if 'user_id' not in session:
             return redirect(url_for('login'))
         
-        # Verify user still exists and email is verified
-        user_id = session.get('user_id')
-        user = users_db.get(user_id)
-        if not user or not user.get('email_verified', False):
+        # Verify user still exists and email is verified in the database.
+        user_email = (session.get('user_id') or '').strip().lower()
+        user = User.query.filter_by(email=user_email).first()
+        if not user or not user.email_verified:
             session.clear()
             flash('Session expired or email not verified. Please log in again.', 'error')
             return redirect(url_for('login'))
+
+        # Keep display name refreshed for templates that rely on session name.
+        session['user_name'] = user.name or session.get('user_name', '')
         
         return f(*args, **kwargs)
     return decorated_function

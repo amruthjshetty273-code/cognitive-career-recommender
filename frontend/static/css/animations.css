@@ -54,6 +54,26 @@
     }
 }
 
+@keyframes auroraDrift {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+        transform: translate3d(16px, 12px, 0) scale(1.06);
+    }
+}
+
+@keyframes gradientShift {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
 .animate-fadeInUp {
     animation: fadeInUp 0.45s ease both;
 }
@@ -72,4 +92,14 @@
 
 .notification-slide-out {
     animation: slideOutRight 0.22s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-fadeInUp,
+    .animate-pulse,
+    .animate-shake,
+    .notification-slide-in,
+    .notification-slide-out {
+        animation: none !important;
+    }
 }

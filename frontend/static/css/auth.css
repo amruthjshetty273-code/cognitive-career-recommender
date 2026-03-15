@@ -61,13 +61,134 @@ html[data-bs-theme='dark'] .theme-toggle-btn:hover {
 }
 
 .auth-container {
-    padding: 3rem 0 2.5rem;
+    padding: 3.25rem 0 2.75rem;
+}
+
+.auth-layout-grid {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.96fr) minmax(0, 1.04fr);
+    gap: 24px;
+    align-items: stretch;
+}
+
+.auth-showcase {
+    position: relative;
+    display: flex;
+}
+
+.auth-showcase-inner {
+    width: 100%;
+    border-radius: 24px;
+    padding: 2rem;
+    background:
+        radial-gradient(circle at top right, rgba(242, 185, 75, 0.18), transparent 32%),
+        linear-gradient(145deg, #0d2b54, #11467b 58%, #0f6d82);
+    color: #eff7ff;
+    box-shadow: 0 26px 54px rgba(9, 23, 43, 0.18);
+    overflow: hidden;
+}
+
+.auth-showcase-eyebrow,
+.auth-card-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.auth-showcase-eyebrow {
+    color: rgba(233, 245, 255, 0.76);
+}
+
+.auth-card-eyebrow {
+    color: #0f5a92;
+}
+
+.auth-showcase-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.02;
+    margin: 0 0 1rem;
+    max-width: 12ch;
+}
+
+.auth-showcase-copy {
+    color: rgba(239, 247, 255, 0.88);
+    max-width: 48ch;
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+}
+
+.auth-showcase-panel {
+    display: grid;
+    gap: 12px;
+}
+
+.auth-showcase-item {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 14px 15px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+}
+
+.auth-showcase-item i {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.auth-showcase-item strong {
+    display: block;
+    font-size: 0.98rem;
+    margin-bottom: 2px;
+}
+
+.auth-showcase-item span {
+    color: rgba(236, 246, 255, 0.78);
+    font-size: 0.93rem;
+    line-height: 1.45;
+}
+
+.auth-showcase-footer {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    color: rgba(237, 247, 255, 0.78);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-signal-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #63e7cc;
+    box-shadow: 0 0 0 6px rgba(99, 231, 204, 0.14);
+}
+
+.auth-stage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .auth-card {
     background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15);
+    border-radius: 24px;
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.15);
     border: 1px solid rgba(15, 23, 42, 0.05);
     overflow: hidden;
 }
@@ -79,7 +200,7 @@ html[data-bs-theme='dark'] .auth-card {
 }
 
 .auth-card-header {
-    padding: 1.5rem 1.75rem 0.75rem;
+    padding: 1.75rem 2rem 0.85rem;
 }
 
 .auth-title {
@@ -98,12 +219,12 @@ html[data-bs-theme='dark'] .auth-title {
 }
 
 .auth-card-body {
-    padding: 1.25rem 1.75rem;
+    padding: 1.35rem 2rem;
 }
 
 .auth-card-footer {
     border-top: 1px solid rgba(15, 23, 42, 0.07);
-    padding: 1rem 1.75rem 1.25rem;
+    padding: 1rem 2rem 1.4rem;
     background: #fbfcff;
 }
 
@@ -286,7 +407,38 @@ html[data-bs-theme='dark'] .verify-help-text {
     gap: 12px;
 }
 
+@media (max-width: 991px) {
+    .auth-layout-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-showcase-inner {
+        padding: 1.5rem;
+    }
+
+    .auth-showcase-title {
+        max-width: none;
+        font-size: clamp(1.6rem, 5vw, 2.3rem);
+    }
+}
+
 @media (max-width: 576px) {
+    .auth-container {
+        padding: 1.2rem 0 1.6rem;
+    }
+
+    .auth-card,
+    .auth-showcase-inner {
+        border-radius: 18px;
+    }
+
+    .auth-card-header,
+    .auth-card-body,
+    .auth-card-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
     .verify-actions {
         grid-template-columns: 1fr;
     }
