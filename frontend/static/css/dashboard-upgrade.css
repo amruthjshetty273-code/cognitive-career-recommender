@@ -1,0 +1,67 @@
+/* Dashboard UI upgrade: cards, color, animation */
+.dashboard-main {
+  padding: 32px 24px;
+  background: var(--dash-bg);
+}
+.dashboard-section {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(16,34,63,0.10);
+  margin-bottom: 32px;
+  padding: 28px 24px;
+  transition: box-shadow 0.2s;
+}
+.dashboard-section:hover {
+  box-shadow: 0 16px 48px rgba(16,34,63,0.16);
+}
+.dashboard-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--dash-primary);
+  margin-bottom: 18px;
+}
+.dashboard-card {
+  background: #f7fafc;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(18,74,136,0.08);
+  padding: 18px 16px;
+  margin-bottom: 18px;
+  transition: background 0.2s;
+}
+.dashboard-card:hover {
+  background: #eaf4ff;
+}
+.dashboard-btn {
+  background: linear-gradient(135deg, #11a89f, #1b74b8);
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(18,74,136,0.12);
+  border: none;
+  transition: background 0.2s, transform 0.2s;
+}
+.dashboard-btn:hover {
+  background: linear-gradient(135deg, #1b74b8, #11a89f);
+  transform: scale(1.04);
+}
+@media (max-width: 900px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-sidebar {
+    position: static;
+    height: auto;
+    padding: 18px 8px;
+  }
+  .dashboard-main {
+    padding: 18px 6px;
+  }
+}
+.fade-in {
+  animation: fadeIn 0.7s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}

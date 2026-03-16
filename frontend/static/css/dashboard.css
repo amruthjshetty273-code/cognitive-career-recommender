@@ -275,17 +275,24 @@
 
 .hero-btn {
     border-radius: 999px;
+    transition: box-shadow 0.22s cubic-bezier(0.42,0,0.58,1),
+        background 0.22s cubic-bezier(0.42,0,0.58,1),
+        color 0.22s cubic-bezier(0.42,0,0.58,1),
+        transform 0.18s cubic-bezier(0.42,0,0.58,1);
 }
 
-.hero-btn-primary {
-    font-weight: 700;
-    padding: 10px 20px;
-    box-shadow: 0 10px 20px rgba(13, 85, 143, 0.3);
+.hero-btn-primary:hover {
+    box-shadow: 0 12px 32px rgba(27, 58, 107, 0.22);
+    background: linear-gradient(135deg, #143257, #1f4c88);
+    color: #fff;
+    transform: translateY(-2px) scale(1.03);
 }
 
-.hero-btn-secondary {
-    border-width: 1.5px;
-    padding: 10px 18px;
+.hero-btn-secondary:hover {
+    box-shadow: 0 8px 18px rgba(21, 166, 160, 0.18);
+    background: #eaf7fa;
+    color: var(--dash-primary);
+    transform: translateY(-1px) scale(1.02);
 }
 
 .hero-meta {

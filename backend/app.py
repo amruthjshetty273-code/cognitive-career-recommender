@@ -116,7 +116,7 @@ app.secret_key = app.config.get('SECRET_KEY') or secrets.token_hex(32)
 
 @app.context_processor
 def inject_csrf_token():
-    return {'csrf_token': generate_csrf}
+    return {'csrf_token': generate_csrf()}
 
 # Security headers middleware
 @app.after_request

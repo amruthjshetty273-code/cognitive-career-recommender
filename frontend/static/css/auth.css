@@ -205,6 +205,10 @@ html[data-bs-theme='dark'] .theme-toggle-btn:hover {
     border: 1px solid rgba(15, 23, 42, 0.05);
     overflow: hidden;
     backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeInUp 0.55s cubic-bezier(0.42,0,0.58,1) forwards;
+    animation-delay: 0.18s;
 }
 
 html[data-bs-theme='dark'] .auth-card {

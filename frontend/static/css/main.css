@@ -53,6 +53,22 @@ html[data-bs-theme='dark'] a:hover {
     border-color: transparent;
 }
 
+.btn-outline-primary {
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    transition: box-shadow 0.22s cubic-bezier(0.42,0,0.58,1),
+        background 0.22s cubic-bezier(0.42,0,0.58,1),
+        color 0.22s cubic-bezier(0.42,0,0.58,1),
+        transform 0.18s cubic-bezier(0.42,0,0.58,1);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    box-shadow: 0 8px 18px rgba(21, 166, 160, 0.18);
+    background: #eaf7fa;
+    color: var(--primary);
+    transform: translateY(-1px) scale(1.02);
+}
+
 .site-navbar {
     background: rgba(255, 255, 255, 0.88) !important;
     backdrop-filter: blur(10px);

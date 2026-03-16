@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - CareerAI</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
@@ -13,6 +13,7 @@
     <link href="{{ url_for('static', filename='css/main.css') }}?v={{ range(1, 99999) | random }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/dashboard.css') }}?v={{ range(1, 99999) | random }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/animations.css') }}?v={{ range(1, 99999) | random }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/dashboard-upgrade.css') }}?v={{ range(1, 99999) | random }}" rel="stylesheet">
     
     <style>
         /* Font Awesome icon rendering fix */
@@ -28,6 +29,19 @@
             font-family: "Font Awesome 6 Free" !important;
             font-weight: 900 !important;
         }
+
+        .nav-logout {
+            background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+            color: #fff !important;
+            font-weight: 700;
+            margin-top: 12px;
+            box-shadow: 0 4px 16px rgba(220,38,38,0.12);
+        }
+        .nav-logout:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #f59e0b 100%);
+            color: #fff !important;
+            transform: translateX(2px) scale(1.04);
+        }
     </style>
 </head>
 <body class="dashboard-body">
@@ -35,78 +49,78 @@
         <aside class="dashboard-sidebar">
             <div class="sidebar-brand">
                 <div class="brand-mark"><i class="fas fa-brain"></i></div>
-                <div>
-                    <div class="brand-title">CareerAI</div>
-                    <div class="brand-subtitle">Skill-Based Matching</div>
-                </div>
-                <button type="button" id="theme-toggle" class="btn btn-sm dashboard-theme-toggle ms-auto" title="Toggle Theme" aria-label="Toggle Theme">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
+                <div class="dashboard-shell">
+                    <aside class="dashboard-sidebar">
+                        <div class="sidebar-brand">
+                            <div class="brand-mark"><i class="fas fa-brain"></i></div>
+                            <div>
+                                <div class="brand-title">CareerAI</div>
+                                <div class="brand-subtitle">Skill-Based Matching</div>
+                            </div>
+                            <button type="button" id="theme-toggle" class="btn btn-sm dashboard-theme-toggle ms-auto" title="Toggle Theme" aria-label="Toggle Theme">
+                                <i class="fas fa-moon"></i>
+                            </button>
+                        </div>
 
-            <div class="sidebar-user">
-                <div class="user-avatar">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <div>
-                    <div class="user-name">{% if user.name %}{{ user.name }}{% else %}User{% endif %}</div>
-                    <div class="user-email">{{ user.email }}</div>
-                </div>
-            </div>
+                        <div class="sidebar-user">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <div class="user-name">{% if user.name %}{{ user.name }}{% else %}User{% endif %}</div>
+                                <div class="user-email">{{ user.email }}</div>
+                            </div>
+                        </div>
 
-            <nav class="sidebar-nav">
-                <div class="nav-group-title">Main</div>
-                <a class="nav-item active" href="#overview" id="dashboardNav">
-                    <i class="fas fa-th-large"></i>
-                    Dashboard
-                </a>
-                <div class="nav-group-title">Profile</div>
-                <a class="nav-item" href="#input-modes" id="uploadResumeNav">
-                    <i class="fas fa-file-upload"></i>
-                    Upload Resume
-                </a>
-                <a class="nav-item" href="#manual-profile" id="manualProfileNav">
-                    <i class="fas fa-edit"></i>
-                    Manual Profile
-                </a>
-                <a class="nav-item" href="#ai-upgrades" id="aiUpgradesNav">
-                    <i class="fas fa-microchip"></i>
-                    AI + Speech Lab
-                </a>
-                <div class="nav-group-title">Career</div>
-                <a class="nav-item" href="#career-matches" id="careersNav">
-                    <i class="fas fa-briefcase"></i>
-                    Career Matches
-                </a>
-                <a class="nav-item" href="#research-metrics" id="researchNav">
-                    <i class="fas fa-flask"></i>
-                    Research Metrics
-                </a>
-                <a class="nav-item" href="#skill-gap" id="skillsNav">
-                    <i class="fas fa-chart-bar"></i>
-                    Skill Gap
-                </a>
-                <a class="nav-item" href="#roadmap" id="roadmapNav">
-                    <i class="fas fa-map-marked-alt"></i>
-                    Learning Roadmap
-                </a>
-                <div class="nav-group-title">Other</div>
-                <a class="nav-item" href="#feedback" id="feedbackNav">
-                    <i class="fas fa-comments"></i>
-                    Feedback History
-                </a>
-                <a class="nav-item" href="/logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Logout
-                </a>
-            </nav>
+                        <nav class="sidebar-nav">
+                            <div class="nav-group-title">Main</div>
+                            <a class="nav-item active" href="#overview" id="dashboardNav">
+                                <i class="fas fa-th-large"></i>
+                                Dashboard
+                            </a>
+                            <div class="nav-group-title">Profile</div>
+                            <a class="nav-item" href="#input-modes" id="uploadResumeNav">
+                                <i class="fas fa-file-upload"></i>
+                                Upload Resume
+                            </a>
+                            <a class="nav-item" href="#manual-profile" id="manualProfileNav">
+                                <i class="fas fa-edit"></i>
+                                Manual Profile
+                            </a>
+                            <a class="nav-item" href="#ai-upgrades" id="aiUpgradesNav">
+                                <i class="fas fa-microchip"></i>
+                                AI + Speech Lab
+                            </a>
+                            <div class="nav-group-title">Career</div>
+                            <a class="nav-item" href="#career-matches" id="careersNav">
+                                <i class="fas fa-briefcase"></i>
+                                Career Matches
+                            </a>
+                            <a class="nav-item" href="#research-metrics" id="researchNav">
+                                <i class="fas fa-flask"></i>
+                                Research Metrics
+                            </a>
+                            <a class="nav-item" href="#skill-gap" id="skillsNav">
+                                <i class="fas fa-chart-bar"></i>
+                                Skill Gap
+                            </a>
+                        </nav>
+                    </aside>
 
-            <div class="sidebar-footer">
-                <div class="status-chip">
-                    <span class="status-dot"></span>
-                    System ready for profile input
+                    <main class="dashboard-main fade-in">
+                        <section class="dashboard-section">
+                            <div class="dashboard-title">Welcome to CareerAI Dashboard</div>
+                            <div class="dashboard-card">
+                                <p>Get personalized career recommendations, skill gap analysis, and roadmap guidance.</p>
+                                <button class="dashboard-btn">Explore Careers</button>
+                            </div>
+                            <div class="dashboard-card">
+                                <p>Upload your resume or build your profile to unlock tailored insights.</p>
+                                <button class="dashboard-btn">Upload Resume</button>
+                            </div>
+                        </section>
+                    </main>
                 </div>
-            </div>
         </aside>
 
         <main class="dashboard-main">
