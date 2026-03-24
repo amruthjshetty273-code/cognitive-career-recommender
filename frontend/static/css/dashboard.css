@@ -197,6 +197,26 @@
     box-shadow: 0 0 0 6px rgba(95, 244, 193, 0.18);
 }
 
+.nav-logout {
+    border-radius: 10px;
+    padding: 9px 10px;
+    color: rgba(237, 246, 255, 0.88);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.92rem;
+    transition: transform 0.16s ease, background-color 0.16s ease;
+    margin-top: auto;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-logout:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
+    transform: translateX(2px);
+}
+
 .dashboard-main {
     position: relative;
     z-index: 1;
