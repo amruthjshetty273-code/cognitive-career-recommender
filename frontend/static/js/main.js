@@ -391,9 +391,9 @@ CognitiveCareerAI.showAlert = function(type, message, options = {}) {
     `;
     alertContainer.insertAdjacentHTML('beforeend', alertHTML);
     
-    // Auto-dismiss alerts after 5 seconds (unless persistent is set)
+    // Auto-dismiss alerts after 4 seconds (unless persistent is set)
     if (options.persistent !== true) {
-        const duration = options.duration || 5000;
+        const duration = options.duration || 4000;
         
         // Auto-dismiss the alert
         setTimeout(() => {

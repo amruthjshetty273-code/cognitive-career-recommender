@@ -829,18 +829,18 @@ def _load_user_profile_snapshot(user):
     }
 
 def login_required(f):
-    """Decorator to require login AND email verification for protected routes"""
+    """Decorator to require an active logged-in user for protected routes."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
             return redirect(url_for('login'))
         
-        # Verify user still exists and email is verified in the database.
+        # Verify user still exists in the database.
         user_email = (session.get('user_id') or '').strip().lower()
         user = User.query.filter_by(email=user_email).first()
-        if not user or not user.email_verified:
+        if not user:
             session.clear()
-            flash('Session expired or email not verified. Please log in again.', 'error')
+            flash('Session expired. Please log in again.', 'error')
             return redirect(url_for('login'))
 
         # Keep display name refreshed for templates that rely on session name.
@@ -889,18 +889,9 @@ def login():
 
             if user.verify_password(password):
                 if not user.email_verified:
-                    notice_url, mail_sent = _prepare_verification_notice(user, flow='login_verification')
-                    message = (
-                        'Please verify your email before logging in. We sent a fresh verification email and OTP.'
-                        if mail_sent
-                        else 'Please verify your email before logging in. Use the verification page to resend or verify with OTP.'
-                    )
-                    return jsonify({
-                        'success': False,
-                        'message': message,
-                        'redirect_url': notice_url,
-                        'requires_verification': True,
-                    }), 403
+                    user.email_verified = True
+                    user.email_verification_token = None
+                    _delete_email_otp(user.email)
 
                 # Successful login — rotate session to prevent fixation
                 user.failed_login_attempts = 0
@@ -959,7 +950,7 @@ def validate_password_strength(password):
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    """Handle user registration (DB-backed, with email verification)"""
+    """Handle user registration (DB-backed, no email OTP verification)."""
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes['application/json'] > request.accept_mimetypes['text/html']
     if request.method == 'POST':
         first_name = request.form.get('first_name', '').strip()
@@ -989,74 +980,29 @@ def register():
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            if existing_user.email_verified:
-                if is_ajax:
-                    return jsonify({'success': False, 'errors': ['Email is already registered']}), 400
-                return render_template('auth/register.html', errors=['Email is already registered'])
-
-            notice_url, mail_sent = _prepare_verification_notice(existing_user, flow='existing_account')
-            message = (
-                'This email is already registered but not verified. We sent a fresh verification email and OTP.'
-                if mail_sent
-                else 'This email is already registered but not verified. Use the verification page to resend or verify with OTP.'
-            )
-            flash(message, 'info')
             if is_ajax:
-                return jsonify({
-                    'success': False,
-                    'message': message,
-                    'redirect_url': notice_url,
-                    'requires_verification': True,
-                }), 409
-            return redirect(notice_url)
+                return jsonify({'success': False, 'errors': ['Email is already registered']}), 400
+            return render_template('auth/register.html', errors=['Email is already registered'])
 
-        # Register user (email_verified=False, token generated)
-        user, err, verification_token = AuthService.register(f"{first_name} {last_name}", email, password)
+        # Register and immediately allow access without email OTP verification.
+        user, err = AuthService.register(f"{first_name} {last_name}", email, password)
         if err:
             if is_ajax:
                 return jsonify({'success': False, 'errors': [err]}), 400
             else:
                 return render_template('auth/register.html', errors=[err])
 
-        mail_username = (app.config.get('MAIL_USERNAME') or '').strip()
-        mail_password = (app.config.get('MAIL_PASSWORD') or '').strip()
-        mail_configured = bool(mail_username and mail_password and mail_username != 'your-email@gmail.com')
-        verification_url = url_for('verify_email', token=verification_token, _external=True)
-        otp_code = _generate_email_otp()
-        _save_email_otp(email, otp_code)
-        mail_sent = False
-        mail_status = 'not_configured'
-        if mail_configured:
-            mail_sent = send_verification_email(email, verification_token, first_name, otp_code)
-            mail_status = 'sent' if mail_sent else 'delivery_failed'
-            if not mail_sent:
-                logger.warning(f"EMAIL DELIVERY FAILED - Verification URL: {verification_url}")
-        else:
-            logger.warning(f"EMAIL NOT CONFIGURED - Verification URL: {verification_url}")
-
-        notice_args = {
-            'success': 1,
-            'email': email,
-            'mail_sent': 1 if mail_sent else 0,
-            'mail_status': mail_status,
-        }
-        if not mail_sent and app.config.get('DEBUG'):
-            notice_args['verification_url'] = verification_url
-            notice_args['otp_hint'] = otp_code
-
-        notice_url = url_for('verify_email_notice', **notice_args)
+        session['user_id'] = user.email
+        session['user_name'] = user.name
+        session.permanent = True
         if is_ajax:
-            message = (
-                'Account created! Verification email sent. Please check your inbox.'
-                if mail_sent
-                else 'Account created, but verification email could not be delivered right now. Use OTP or resend email from the next page.'
-            )
             return jsonify({
                 'success': True,
-                'redirect_url': notice_url,
-                'message': message
+                'redirect_url': '/dashboard',
+                'message': 'Account created successfully!'
             })
-        return redirect(notice_url)
+        flash('Account created successfully. Welcome!', 'success')
+        return redirect(url_for('dashboard'))
     # Always return JSON for AJAX GET requests
     if is_ajax:
         return jsonify({'success': False, 'message': 'GET not supported for registration'}), 405
@@ -1129,9 +1075,9 @@ def db_login_required(f):
         if 'user_id' not in session:
             return redirect(url_for('login'))
         user = User.query.filter_by(email=session['user_id']).first()
-        if not user or not user.email_verified:
+        if not user:
             session.clear()
-            flash('Session expired or email not verified. Please log in again.', 'error')
+            flash('Session expired. Please log in again.', 'error')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -1163,7 +1109,7 @@ def forgot_password():
         # Always return the same message to avoid email enumeration
         generic_msg = 'If this email is registered, a password reset link has been sent. Please check your inbox.'
 
-        if user and user.email_verified:
+        if user:
             reset_token = secrets.token_urlsafe(32)
             _save_reset_token(email, reset_token, expiry_minutes=60)
             first_name = (user.name or '').split(' ')[0] if user.name else 'there'

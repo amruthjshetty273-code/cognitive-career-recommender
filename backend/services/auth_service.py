@@ -7,7 +7,6 @@ from models import db, User
 from datetime import datetime, timedelta, timezone
 import jwt
 import os
-import secrets
 
 class AuthService:
     SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-in-production')
@@ -15,8 +14,8 @@ class AuthService:
     @staticmethod
     def register(name, email, password):
         """
-        Register a new user with email verification
-        Returns: (user, error, verification_token)
+        Register a new user
+        Returns: (user, error)
         """
         # Normalizing email
         email = email.lower().strip()
@@ -24,27 +23,24 @@ class AuthService:
         # Check if user exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            return None, "Email already registered", None
-
-        # Generate verification token
-        verification_token = secrets.token_urlsafe(32)
+            return None, "Email already registered"
 
         # Create new user
         user = User(
             name=name,
             email=email,
-            email_verified=False,
-            email_verification_token=verification_token
+            email_verified=True,
+            email_verification_token=None
         )
         user.set_password(password)
 
         try:
             db.session.add(user)
             db.session.commit()
-            return user, None, verification_token
+            return user, None
         except Exception as e:
             db.session.rollback()
-            return None, f"Database error: {str(e)}", None
+            return None, f"Database error: {str(e)}"
     
     @staticmethod
     def login(email, password):
